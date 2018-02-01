@@ -8,6 +8,10 @@
   background: rgba(0, 0, 0, 0.8);
   padding: 15px; }
 
+.ez-uploader__backdrop, .ez-uploader__backdrop * {
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box; }
+
 .ez-uploader__modal {
   max-width: 900px;
   margin: 50px auto 0 auto;
