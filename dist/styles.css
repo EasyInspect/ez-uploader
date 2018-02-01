@@ -10,7 +10,8 @@
 
 .ez-uploader__backdrop, .ez-uploader__backdrop * {
   -webkit-box-sizing: border-box;
-          box-sizing: border-box; }
+          box-sizing: border-box;
+  font-family: sans-serif; }
 
 .ez-uploader__modal {
   max-width: 900px;
