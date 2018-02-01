@@ -1658,94 +1658,80 @@ var EzVDOM = function () {
 
             return (typeof node1 === 'undefined' ? 'undefined' : _typeof(node1)) !== (typeof node2 === 'undefined' ? 'undefined' : _typeof(node2)) || typeof node1 === 'string' && node1 !== node2 || node1.type !== node2.type;
         }
+    }, {
+        key: 'updateElement',
+        value: function updateElement($parent, newNode, oldNode) {
+            var index = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
 
-        /*
-        updateElement($parent, newNode, oldNode, index = 0) {
-              console.log('-- update element', index);
+
+            console.log('-- update element', index);
             console.log('parent', $parent);
             console.log('new node', newNode);
             console.log('old node', oldNode);
             console.log('index', index);
             console.log('new element', $parent.childNodes[index]);
             console.log('//--');
-              if (this.isNil(oldNode)) {
+
+            if (this.isNil(oldNode)) {
                 console.log('- old is nil');
-                $parent.appendChild(
-                    this.createElement(newNode)
-                );
+                $parent.appendChild(this.createElement(newNode));
             } else if (this.isNil(newNode)) {
                 console.log('- new is nil');
-                $parent.removeChild(
-                    $parent.childNodes[index]
-                );
+                $parent.removeChild($parent.childNodes[index]);
             } else if (this.changed(newNode, oldNode)) {
                 console.log('- is changed');
-                $parent.replaceChild(
-                    this.createElement(newNode),
-                    $parent.childNodes[index]
-                );
+                $parent.replaceChild(this.createElement(newNode), $parent.childNodes[index]);
             } else if (newNode.type) {
                 console.log('- has type kek');
-                this.updateProps(
-                    $parent.childNodes[index],
-                    newNode.props,
-                    oldNode.props
-                );
-                const newLength = newNode.children.length;
-                const oldLength = oldNode.children.length;
-                  console.log('-- about to update parents children');
-                  for (let i = 0; i < newLength || i < oldLength; i++) {
-                      this.updateElement(
-                        $parent.childNodes[index],
-                        newNode.children[i],
-                        oldNode.children[i],
-                        i
-                    );
-                  }
+                this.updateProps($parent.childNodes[index], newNode.props, oldNode.props);
+                var newLength = newNode.children.length;
+                var oldLength = oldNode.children.length;
+
+                console.log('-- about to update parents children');
+
+                for (var i = 0; i < newLength || i < oldLength; i++) {
+
+                    this.updateElement($parent.childNodes[index], newNode.children[i], oldNode.children[i], i);
+                }
             }
         }
-        */
-
-    }, {
-        key: 'updateElement',
-        value: function updateElement($parent, newNode, oldNode) {
-            var childNode = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : $parent.childNodes[0];
-
-
-            console.log('-- update element');
+        /*
+          updateElement($parent, newNode, oldNode, childNode = $parent.childNodes[0]) {
+              console.log('-- update element');
             console.log($parent);
             console.log(newNode);
             console.log(oldNode);
             console.log(childNode);
             console.log('//--');
+              if (this.isNil(oldNode)) {
+                  $parent.appendChild(
+                    this.createElement(newNode)
+                );
+              } else if (this.isNil(newNode)) {
+                  $parent.removeChild(childNode);
+                  return -1; // suggests that an element has been removed
+              } else if (this.changed(newNode, oldNode)) {
+                  $parent.replaceChild(
+                    this.createElement(newNode),
+                    childNode
+                );
+              } else if (newNode.type) {
+                  this.updateProps(childNode, newNode.props, oldNode.props);
+                  const max = Math.max(newNode.children.length, oldNode.children.length);
+                  let adjustment = 0;
+                  for (let i = 0; i < max; i++) {
+                      adjustment += this.updateElement(
+                        childNode,
+                        newNode.children[i],
+                        oldNode.children[i],
+                        childNode.childNodes[i + adjustment]
+                    );
+                  }
+              }
+              return 0; // suggest that an element has not been removed
+          }
+        */
 
-            if (this.isNil(oldNode)) {
-
-                $parent.appendChild(this.createElement(newNode));
-            } else if (this.isNil(newNode)) {
-
-                $parent.removeChild(childNode);
-
-                return -1; // suggests that an element has been removed
-            } else if (this.changed(newNode, oldNode)) {
-
-                $parent.replaceChild(this.createElement(newNode), childNode);
-            } else if (newNode.type) {
-
-                this.updateProps(childNode, newNode.props, oldNode.props);
-
-                var max = Math.max(newNode.children.length, oldNode.children.length);
-
-                var adjustment = 0;
-
-                for (var i = 0; i < max; i++) {
-
-                    adjustment += this.updateElement(childNode, newNode.children[i], oldNode.children[i], childNode.childNodes[i + adjustment]);
-                }
-            }
-
-            return 0; // suggest that an element has not been removed
-        }
     }]);
 
     return EzVDOM;

@@ -182,7 +182,6 @@ export default class EzVDOM {
 
     }
 
-    /*
     updateElement($parent, newNode, oldNode, index = 0) {
 
         console.log('-- update element', index);
@@ -233,7 +232,7 @@ export default class EzVDOM {
             }
         }
     }
-    */
+    /*
 
     updateElement($parent, newNode, oldNode, childNode = $parent.childNodes[0]) {
 
@@ -287,5 +286,6 @@ export default class EzVDOM {
         return 0; // suggest that an element has not been removed
 
     }
+    */
 
 }
