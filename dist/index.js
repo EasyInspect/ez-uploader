@@ -80,11 +80,15 @@ return /******/ (function(modules) { // webpackBootstrap
 "use strict";
 
 
-var _main = __webpack_require__(4);
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _main = __webpack_require__(1);
 
 var _main2 = _interopRequireDefault(_main);
 
-var _EzUploader = __webpack_require__(1);
+var _EzUploader = __webpack_require__(2);
 
 var _EzUploader2 = _interopRequireDefault(_EzUploader);
 
@@ -92,8 +96,16 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 window.EzUploader = _EzUploader2.default;
 
+exports.default = _EzUploader2.default;
+
 /***/ }),
 /* 1 */
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -105,11 +117,11 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _resumablejs = __webpack_require__(2);
+var _resumablejs = __webpack_require__(3);
 
 var _resumablejs2 = _interopRequireDefault(_resumablejs);
 
-var _VDOM = __webpack_require__(3);
+var _VDOM = __webpack_require__(4);
 
 var _VDOM2 = _interopRequireDefault(_VDOM);
 
@@ -370,7 +382,7 @@ var EzUploader = function (_EzVDOM) {
 exports.default = EzUploader;
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -1460,7 +1472,7 @@ exports.default = EzUploader;
 
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1740,12 +1752,6 @@ var EzVDOM = function () {
 }();
 
 exports.default = EzVDOM;
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports) {
-
-// removed by extract-text-webpack-plugin
 
 /***/ })
 /******/ ]);
