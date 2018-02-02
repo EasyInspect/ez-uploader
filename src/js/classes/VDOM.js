@@ -28,7 +28,7 @@ export default class EzVDOM {
 
     setElementProp($el, name, value) {
 
-        if (name == 'forceUpdate') {
+        if (this.isCustomProp(name)) {
 
             return;
 
@@ -121,9 +121,15 @@ export default class EzVDOM {
 
     }
 
-    isEventProp(prop) {
+    isEventProp(name) {
 
-        return /^ez-on-/.test(prop);
+        return /^ez-on-/.test(name);
+
+    }
+
+    isCustomProp(name) {
+
+        return name === 'forceUpdate' || this.isEventProp(name);
 
     }
 

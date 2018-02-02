@@ -1,11 +1,14 @@
 
 import style from './scss/main.scss'
 import EzUploader from './js/classes/EzUploader'
-
 import fontawesome from '@fortawesome/fontawesome'
-import faUser from '@fortawesome/fontawesome-free-regular/faUser'
+import faPlay from '@fortawesome/fontawesome-free-solid/faPlay'
+import faPause from '@fortawesome/fontawesome-free-solid/faPause'
+import faTrash from '@fortawesome/fontawesome-free-solid/faTrash'
 
-fontawesome.library.add(faUser);
+fontawesome.library.add(faPlay);
+fontawesome.library.add(faPause);
+fontawesome.library.add(faTrash);
 
 window.EzUploader = EzUploader;
 

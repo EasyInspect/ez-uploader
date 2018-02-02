@@ -96,13 +96,23 @@ var _fontawesome = __webpack_require__(5);
 
 var _fontawesome2 = _interopRequireDefault(_fontawesome);
 
-var _faUser = __webpack_require__(13);
+var _faPlay = __webpack_require__(14);
 
-var _faUser2 = _interopRequireDefault(_faUser);
+var _faPlay2 = _interopRequireDefault(_faPlay);
+
+var _faPause = __webpack_require__(15);
+
+var _faPause2 = _interopRequireDefault(_faPause);
+
+var _faTrash = __webpack_require__(16);
+
+var _faTrash2 = _interopRequireDefault(_faTrash);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-_fontawesome2.default.library.add(_faUser2.default);
+_fontawesome2.default.library.add(_faPlay2.default);
+_fontawesome2.default.library.add(_faPause2.default);
+_fontawesome2.default.library.add(_faTrash2.default);
 
 window.EzUploader = _EzUploader2.default;
 
@@ -170,7 +180,7 @@ var EzUploader = function (_EzVDOM) {
         var _this = _possibleConstructorReturn(this, (EzUploader.__proto__ || Object.getPrototypeOf(EzUploader)).call(this));
 
         _this.settings = {
-            uploader: Object.assign({}, {
+            upload: Object.assign({}, {
                 url: null,
                 headers: {}
             }, upload),
@@ -199,8 +209,8 @@ var EzUploader = function (_EzVDOM) {
             var drop = document.querySelectorAll("[ez-uploader-drop]")[0];
 
             this.uploader = new _resumablejs2.default({
-                target: this.settings.url,
-                headers: this.settings.headers
+                target: this.settings.upload.url,
+                headers: this.settings.upload.headers
             });
 
             this.uploader.assignBrowse(browse);
@@ -306,6 +316,20 @@ var EzUploader = function (_EzVDOM) {
             this.updateDOM();
         }
     }, {
+        key: 'pauseFile',
+        value: function pauseFile(file) {
+
+            file.pause();
+            this.updateDOM();
+        }
+    }, {
+        key: 'retryFile',
+        value: function retryFile(file) {
+
+            file.abort();
+            this.updateDOM();
+        }
+    }, {
         key: 'removeAllFiles',
         value: function removeAllFiles() {
 
@@ -358,9 +382,49 @@ var EzUploader = function (_EzVDOM) {
             }
         }
     }, {
+        key: 'getFileOptionsVDOM',
+        value: function getFileOptionsVDOM(file) {
+            var _this4 = this;
+
+            var options = [];
+
+            console.log('get options for file', file);
+
+            if (file.isUploading()) {
+
+                options.push(h(
+                    'div',
+                    { 'ez-on-click': function ezOnClick() {
+                            return _this4.pauseFile(file);
+                        }, className: 'ez-uploader__modal-icon-button ez-uploader__modal-icon-button-wet-asphalt' },
+                    h('i', { 'class': 'fas fa-pause' })
+                ));
+            } else {
+
+                options.push(h(
+                    'div',
+                    { 'ez-on-click': function ezOnClick() {
+                            return _this4.retryFile(file);
+                        }, className: 'ez-uploader__modal-icon-button ez-uploader__modal-icon-button-wet-asphalt' },
+                    h('i', { 'class': 'fas fa-play' })
+                ));
+            }
+
+            options.push(h(
+                'div',
+                { 'ez-on-click': function ezOnClick() {
+                        return _this4.removeFile(file);
+                    }, className: 'ez-uploader__modal-icon-button ez-uploader__modal-icon-button-red' },
+                h('i', { 'class': 'fas fa-trash' })
+            ));
+
+            console.log('options', options);
+
+            return options;
+        }
+    }, {
         key: 'getFileVDOM',
         value: function getFileVDOM(file) {
-            var _this4 = this;
 
             return h(
                 'div',
@@ -384,13 +448,7 @@ var EzUploader = function (_EzVDOM) {
                 h(
                     'div',
                     { className: 'ez-uploader__modal-file-options' },
-                    h(
-                        'div',
-                        { 'ez-on-click': function ezOnClick() {
-                                return _this4.removeFile(file);
-                            }, className: 'ez-uploader__modal-button ez-uploader__modal-button-red' },
-                        'remove'
-                    )
+                    this.getFileOptionsVDOM(file)
                 )
             );
         }
@@ -1648,7 +1706,7 @@ var EzVDOM = function () {
         key: 'setElementProp',
         value: function setElementProp($el, name, value) {
 
-            if (name == 'forceUpdate') {
+            if (this.isCustomProp(name)) {
 
                 return;
             } else if (name === 'className') {
@@ -1733,10 +1791,16 @@ var EzVDOM = function () {
         }
     }, {
         key: 'isEventProp',
-        value: function isEventProp(prop) {
+        value: function isEventProp(name) {
 
-            return (/^ez-on-/.test(prop)
+            return (/^ez-on-/.test(name)
             );
+        }
+    }, {
+        key: 'isCustomProp',
+        value: function isCustomProp(name) {
+
+            return name === 'forceUpdate' || this.isEventProp(name);
         }
     }, {
         key: 'isNil',
@@ -3915,10 +3979,23 @@ process.umask = function() { return 0; };
 /* 10 */,
 /* 11 */,
 /* 12 */,
-/* 13 */
+/* 13 */,
+/* 14 */
 /***/ (function(module, exports) {
 
-module.exports = { prefix: 'far', iconName: 'user', icon: [512, 512, [], "f007", "M423.309 291.025L402.221 285C431.798 243.89 436 202.294 436 180 436 80.649 355.484 0 256 0 156.649 0 76 80.516 76 180c0 22.299 4.198 63.884 33.779 105l-21.088 6.025C21.28 310.285 0 371.59 0 408.605v25.681C0 477.138 34.862 512 77.714 512h356.571C477.138 512 512 477.138 512 434.286v-25.681c0-36.247-20.725-98.161-88.691-117.58zM256 48c72.902 0 132 59.099 132 132s-59.098 132-132 132-132-59.099-132-132S183.098 48 256 48zm208 386.286c0 16.41-13.304 29.714-29.714 29.714H77.714C61.304 464 48 450.696 48 434.286v-25.681c0-33.167 21.987-62.316 53.878-71.427l46.103-13.172C162.683 335.058 200.427 360 256 360s93.317-24.942 108.019-35.994l46.103 13.172C442.013 346.29 464 375.438 464 408.605v25.681z"] };
+module.exports = { prefix: 'fas', iconName: 'play', icon: [448, 512, [], "f04b", "M424.4 214.7L72.4 6.6C43.8-10.3 0 6.1 0 47.9V464c0 37.5 40.7 60.1 72.4 41.3l352-208c31.4-18.5 31.5-64.1 0-82.6z"] };
+
+/***/ }),
+/* 15 */
+/***/ (function(module, exports) {
+
+module.exports = { prefix: 'fas', iconName: 'pause', icon: [448, 512, [], "f04c", "M144 479H48c-26.5 0-48-21.5-48-48V79c0-26.5 21.5-48 48-48h96c26.5 0 48 21.5 48 48v352c0 26.5-21.5 48-48 48zm304-48V79c0-26.5-21.5-48-48-48h-96c-26.5 0-48 21.5-48 48v352c0 26.5 21.5 48 48 48h96c26.5 0 48-21.5 48-48z"] };
+
+/***/ }),
+/* 16 */
+/***/ (function(module, exports) {
+
+module.exports = { prefix: 'fas', iconName: 'trash', icon: [448, 512, [], "f1f8", "M0 84V56c0-13.3 10.7-24 24-24h112l9.4-18.7c4-8.2 12.3-13.3 21.4-13.3h114.3c9.1 0 17.4 5.1 21.5 13.3L312 32h112c13.3 0 24 10.7 24 24v28c0 6.6-5.4 12-12 12H12C5.4 96 0 90.6 0 84zm415.2 56.7L394.8 467c-1.6 25.3-22.6 45-47.9 45H101.1c-25.3 0-46.3-19.7-47.9-45L32.8 140.7c-.4-6.9 5.1-12.7 12-12.7h358.5c6.8 0 12.3 5.8 11.9 12.7z"] };
 
 /***/ })
 /******/ ]);

@@ -183,3 +183,27 @@
 .ez-uploader__modal-button-wet-asphalt:hover {
   background: #2c3e50;
 }
+
+.ez-uploader__modal-icon-button {
+  font-size: 20px;
+  padding: 5px;
+  cursor: pointer;
+  transition: all 150ms;
+  color: darkgrey;
+  margin-left: 10px;
+}
+.ez-uploader__modal-icon-button:hover {
+  color: #797979;
+}
+.ez-uploader__modal-icon-button-red {
+  color: #e74c3c;
+}
+.ez-uploader__modal-icon-button-red:hover {
+  color: #c0392b;
+}
+.ez-uploader__modal-icon-button-wet-asphalt {
+  color: #34495e;
+}
+.ez-uploader__modal-icon-button-wet-asphalt:hover {
+  color: #2c3e50;
+}

@@ -16,7 +16,7 @@ export default class EzUploader extends EzVDOM {
         super();
 
         this.settings = {
-            uploader: Object.assign({}, {
+            upload: Object.assign({}, {
                 url: null,
                 headers: {},
             }, upload),
@@ -48,8 +48,8 @@ export default class EzUploader extends EzVDOM {
         const drop = document.querySelectorAll("[ez-uploader-drop]")[0];
 
         this.uploader = new Resumable({
-            target: this.settings.url,
-            headers: this.settings.headers
+            target: this.settings.upload.url,
+            headers: this.settings.upload.headers
         });
 
         this.uploader.assignBrowse(browse);
@@ -158,6 +158,20 @@ export default class EzUploader extends EzVDOM {
 
     }
 
+    pauseFile(file) {
+
+        file.pause();
+        this.updateDOM();
+
+    }
+
+    retryFile(file) {
+
+        file.abort();
+        this.updateDOM();
+
+    }
+
     removeAllFiles() {
 
         console.log('remove all files');
@@ -211,6 +225,42 @@ export default class EzUploader extends EzVDOM {
 
     }
 
+    getFileOptionsVDOM(file) {
+
+        let options = [];
+
+        console.log('get options for file', file);
+
+        if (file.isUploading()) {
+
+            options.push(
+                <div ez-on-click={() => this.pauseFile(file)} className="ez-uploader__modal-icon-button ez-uploader__modal-icon-button-wet-asphalt">
+                    <i class="fas fa-pause"></i>
+                </div>
+            )
+
+        } else {
+
+            options.push(
+                <div ez-on-click={() => this.retryFile(file)} className="ez-uploader__modal-icon-button ez-uploader__modal-icon-button-wet-asphalt">
+                    <i class="fas fa-play"></i>
+                </div>
+            )
+
+        }
+
+        options.push(
+            <div ez-on-click={() => this.removeFile(file)} className="ez-uploader__modal-icon-button ez-uploader__modal-icon-button-red">
+                <i class="fas fa-trash"></i>
+            </div>
+        );
+
+        console.log('options', options);
+
+        return options
+
+    }
+
     getFileVDOM(file) {
 
         return (
@@ -225,7 +275,7 @@ export default class EzUploader extends EzVDOM {
                     </div>
                 </div>
                 <div className="ez-uploader__modal-file-options">
-                    <div ez-on-click={() => this.removeFile(file)} className="ez-uploader__modal-button ez-uploader__modal-button-red">remove</div>
+                    {this.getFileOptionsVDOM(file)}
                 </div>
             </div>
         )
