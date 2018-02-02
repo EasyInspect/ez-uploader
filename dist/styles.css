@@ -19,7 +19,8 @@
   background: white;
   -webkit-box-shadow: 0px 0px 3px 1px black;
           box-shadow: 0px 0px 3px 1px black;
-  min-height: 500px; }
+  min-height: 500px;
+  border-radius: 3px; }
 
 .ez-uploader__modal-header {
   padding: 15px;
@@ -62,7 +63,59 @@
 
 .ez-uploader__modal-body {
   height: 500px;
-  padding: 15px; }
+  padding: 15px;
+  overflow-x: hidden;
+  overflow-y: auto; }
+
+.ez-uploader__modal-file {
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #dedede;
+  height: 75px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex; }
+
+.ez-uploader__modal-file-image {
+  width: 75px;
+  overflow: hidden;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  border: 1px solid #dedede;
+  border-radius: 5px;
+  background: #3498db; }
+  .ez-uploader__modal-file-image img {
+    max-height: 100%; }
+
+.ez-uploader__modal-file-text {
+  -webkit-box-flex: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
+  padding: 10px; }
+
+.ez-uploader__modal-file-name {
+  margin-bottom: 5px; }
+
+.ez-uploader__modal-file-description {
+  opacity: 0.8; }
+
+.ez-uploader__modal-file-options {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center; }
 
 .ez-uploader__modal-footer {
   border-top: 1px solid #dedede;
@@ -113,3 +166,15 @@
 
 .ez-uploader__modal-button-lightblue:hover {
   background: #2980b9; }
+
+.ez-uploader__modal-button-red {
+  background: #e74c3c; }
+
+.ez-uploader__modal-button-red:hover {
+  background: #c0392b; }
+
+.ez-uploader__modal-button-wet-asphalt {
+  background: #34495e; }
+
+.ez-uploader__modal-button-wet-asphalt:hover {
+  background: #2c3e50; }

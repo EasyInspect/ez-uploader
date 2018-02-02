@@ -28,9 +28,9 @@ export default class EzVDOM {
 
     setElementProp($el, name, value) {
 
-        if (this.isEventProp(name)) {
+        if (name == 'forceUpdate') {
 
-            this.addEventListenerFromProp($el, name, value);
+            return;
 
         } else if (name === 'className') {
 
@@ -94,23 +94,30 @@ export default class EzVDOM {
 
             this.removeProp($el, name, oldVal);
 
-        } else if (!oldVal || newVal !== oldVal) {
+        } else if (!oldVal || JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
 
-            this.setProp($el, name, newVal);
+            this.setElementProp($el, name, newVal);
 
         }
 
     }
 
-    updateProps($el, newProps, oldProps = {}) {
+    updateProps($el, newProps = {}, oldProps = {}) {
 
-        const props = Object.assign({}, newProps, oldProps);
+        if ($el && $el.setAttribute) {
 
-        Object.keys(props).forEach(name => {
+            const props = Object.assign({}, newProps, oldProps);
 
-            this.updateProp($el, name, newProps[name], oldProps[name]);
+            Object.keys(props).forEach(name => {
 
-        });
+                const newProp = newProps && newProps[name] || null;
+                const oldProp = oldProps && oldProps[name] || null;
+
+                this.updateProp($el, name, newProp, oldProp);
+
+            });
+
+        }
 
     }
 
@@ -136,10 +143,38 @@ export default class EzVDOM {
 
         const event = this.extractEventName(name);
 
+        if (typeof method === 'string' && this[method]) {
+
+            method = this[method].bind(this);
+
+        }
+
         $el.addEventListener(
             event,
-            this[method].bind(this)
+            method
         );
+
+    }
+
+    addEventListenersFromProps($el, props) {
+
+        if (props) {
+
+            const properties = Object.keys(props);
+
+            properties.forEach(name => {
+
+                if (this.isEventProp(name)) {
+
+                    const method = props[name];
+
+                    this.addEventListenerFromProp($el, name, method);
+
+                }
+
+            })
+
+        }
 
     }
 
@@ -166,6 +201,7 @@ export default class EzVDOM {
         const $el = document.createElement(node.type);
 
         this.setElementProps($el, node.props);
+        this.addEventListenersFromProps($el, node.props);
         this.addChildrenToElement($el, node.children);
 
         return $el;
@@ -176,40 +212,30 @@ export default class EzVDOM {
 
         return (
             typeof node1 !== typeof node2 ||
-            typeof node1 === 'string' && node1 !== node2 ||
-            node1.type !== node2.type
+            typeof node1 === 'string' || typeof node1 === 'number' && node1 !== node2 ||
+            node1.type !== node2.type ||
+            node1.props && node1.props.forceUpdate
         )
 
     }
+    /*
 
     updateElement($parent, newNode, oldNode, index = 0) {
 
-        console.log('-- update element', index);
-        console.log('parent', $parent);
-        console.log('new node', newNode);
-        console.log('old node', oldNode);
-        console.log('index', index);
-        console.log('new element', $parent.childNodes[index]);
-        console.log('//--');
-
         if (this.isNil(oldNode)) {
-            console.log('- old is nil');
             $parent.appendChild(
                 this.createElement(newNode)
             );
         } else if (this.isNil(newNode)) {
-            console.log('- new is nil');
             $parent.removeChild(
                 $parent.childNodes[index]
             );
         } else if (this.changed(newNode, oldNode)) {
-            console.log('- is changed');
             $parent.replaceChild(
                 this.createElement(newNode),
                 $parent.childNodes[index]
             );
         } else if (newNode.type) {
-            console.log('- has type kek');
             this.updateProps(
                 $parent.childNodes[index],
                 newNode.props,
@@ -217,8 +243,6 @@ export default class EzVDOM {
             );
             const newLength = newNode.children.length;
             const oldLength = oldNode.children.length;
-
-            console.log('-- about to update parents children');
 
             for (let i = 0; i < newLength || i < oldLength; i++) {
 
@@ -232,16 +256,18 @@ export default class EzVDOM {
             }
         }
     }
-    /*
+    */
 
-    updateElement($parent, newNode, oldNode, childNode = $parent.childNodes[0]) {
+    updateElement($parent, newNode, oldNode, $el = $parent.childNodes[0]) {
 
+        /*
         console.log('-- update element');
         console.log($parent);
         console.log(newNode);
         console.log(oldNode);
-        console.log(childNode);
+        console.log($el);
         console.log('//--');
+        */
 
         if (this.isNil(oldNode)) {
 
@@ -251,7 +277,7 @@ export default class EzVDOM {
 
         } else if (this.isNil(newNode)) {
 
-            $parent.removeChild(childNode);
+            $parent.removeChild($el);
 
             return -1; // suggests that an element has been removed
 
@@ -259,12 +285,12 @@ export default class EzVDOM {
 
             $parent.replaceChild(
                 this.createElement(newNode),
-                childNode
+                $el
             );
 
         } else if (newNode.type) {
 
-            this.updateProps(childNode, newNode.props, oldNode.props);
+            this.updateProps($el, newNode.props, oldNode.props);
 
             const max = Math.max(newNode.children.length, oldNode.children.length);
 
@@ -273,10 +299,10 @@ export default class EzVDOM {
             for (let i = 0; i < max; i++) {
 
                 adjustment += this.updateElement(
-                    childNode,
+                    $el,
                     newNode.children[i],
                     oldNode.children[i],
-                    childNode.childNodes[i + adjustment]
+                    $el.childNodes[i + adjustment]
                 );
 
             }
@@ -286,6 +312,5 @@ export default class EzVDOM {
         return 0; // suggest that an element has not been removed
 
     }
-    */
 
 }

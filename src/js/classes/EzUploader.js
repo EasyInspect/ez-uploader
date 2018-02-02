@@ -11,20 +11,28 @@ function h(type, props, ...children) {
 
 export default class EzUploader extends EzVDOM {
 
-    constructor(settings) {
+    constructor({ upload, ui } = {}) {
 
         super();
 
-        this.settings = Object.assign({}, {
-            url: null,
-            headers: {}
-        }, settings);
+        this.settings = {
+            uploader: Object.assign({}, {
+                url: null,
+                headers: {},
+            }, upload),
+            ui: Object.assign({}, {
+                thumbnail: false
+            }, ui)
+        };
 
         this.uploader = null;
+        this.mappedFiles = {};
 
         this.addUploaderToDOM();
         this.addResumable();
         this.addKeypressEventListeners();
+
+        window.update = this.updateDOM.bind(this);
 
     }
 
@@ -73,7 +81,31 @@ export default class EzUploader extends EzVDOM {
     }
 
     onFilesAdded(files, event) {
+
         console.log("multiple added", files, event);
+
+        if (this.settings.ui.thumbnail) {
+
+            files.forEach(file => {
+
+                this.mappedFiles[file.uniqueIdentifier] = {};
+
+                const fileReader = new FileReader();
+
+                fileReader.readAsDataURL(file.file);
+                fileReader.onload = event => {
+
+                    this.mappedFiles[file.uniqueIdentifier].src = event.target.result;
+                    console.log('-- updating dom from on load');
+                    this.updateDOM();
+
+                };
+
+            });
+
+        }
+
+        console.log('-- updating dom from on added');
         this.updateDOM();
     }
 
@@ -115,6 +147,38 @@ export default class EzUploader extends EzVDOM {
 
     }
 
+    removeFile(file) {
+
+        console.log('remove file', file.fileName);
+        this.uploader.removeFile(file);
+        console.log('files after remove', this.uploader.files);
+
+        console.log('-- updating dom from on remove');
+        this.updateDOM();
+
+    }
+
+    removeAllFiles() {
+
+        console.log('remove all files');
+        this.uploader.cancel();
+        console.log('files after remove all', this.uploader.files);
+
+        console.log('-- updating dom from on remove all');
+        this.updateDOM();
+
+    }
+
+    convertBytesToMB(bytes) {
+
+        const mb = !isNaN(bytes) ? bytes / 1024 / 1024 : 0;
+
+        return parseFloat(mb).toFixed(2)
+
+    }
+
+    // VDOM/DOM methods
+
     addUploaderToDOM() {
 
         this.cachedVDOM = this.getVDOM();
@@ -127,11 +191,42 @@ export default class EzUploader extends EzVDOM {
 
     }
 
+    getFileImageVDOM(file) {
+
+        if (this.settings.ui.thumbnail && this.mappedFiles[file.uniqueIdentifier] && this.mappedFiles[file.uniqueIdentifier].src) {
+
+            const src = this.mappedFiles[file.uniqueIdentifier].src;
+
+            return (
+                <div className="ez-uploader__modal-file-image">
+                    <img src={src}/>
+                </div>
+            )
+
+        } else {
+
+            return
+
+        }
+
+    }
+
     getFileVDOM(file) {
 
         return (
-            <div className="ez-uploader__modal-file">
-                {file.fileName}
+            <div forceUpdate className="ez-uploader__modal-file">
+                {this.getFileImageVDOM(file)}
+                <div className="ez-uploader__modal-file-text">
+                    <div className="ez-uploader__modal-file-name">
+                        {file.fileName}
+                    </div>
+                    <div className="ez-uploader__modal-file-description">
+                        {this.convertBytesToMB(file.size)} MB
+                    </div>
+                </div>
+                <div className="ez-uploader__modal-file-options">
+                    <div ez-on-click={() => this.removeFile(file)} className="ez-uploader__modal-button ez-uploader__modal-button-red">remove</div>
+                </div>
             </div>
         )
 
@@ -152,11 +247,11 @@ export default class EzUploader extends EzVDOM {
                         </div>
                     </div>
                     <div ez-uploader-drop className="ez-uploader__modal-body">
-                        {this.files.map(this.getFileVDOM)}
+                        {this.files.map(this.getFileVDOM.bind(this))}
                     </div>
                     <div className="ez-uploader__modal-footer">
                         <div className="ez-uploader__modal-footer-left">
-                            <div className="ez-uploader__modal-button">
+                            <div ez-on-click={() => this.removeAllFiles()} className="ez-uploader__modal-button">
                                 Remove all files
                             </div>
                             <div ez-uploader-browse className="ez-uploader__modal-button ez-uploader__modal-button-lightblue">
@@ -177,15 +272,20 @@ export default class EzUploader extends EzVDOM {
 
     updateDOM() {
 
+        console.time('update dom');
         const VDOM = this.getVDOM();
 
-        console.log('update dom from:');
+        console.log('---- UPDATE DOM YO -----');
         console.log('old', this.cachedVDOM);
         console.log('to', VDOM);
+        console.log('files', this.uploader.files);
 
         this.updateElement(this.modal, VDOM.children[0], this.cachedVDOM.children[0]);
 
         this.cachedVDOM = VDOM;
+        console.timeEnd('update dom');
+
+        console.log('// DONE UPDATING DOM //');
 
     }
 
