@@ -171,24 +171,16 @@ export default class EzVDOM {
 
     updateEventListenerFromProp($el, event, newMethod, oldMethod) {
 
-        console.log('updating event listener from prop', $el, event, newMethod, oldMethod);
-
         if ($el && $el.addEventListener) {
-
-            console.log('methods', newMethod === oldMethod);
-            console.log('-', newMethod);
-            console.log('-', oldMethod);
 
             if (oldMethod) {
 
-                console.log('removing old method', event, oldMethod);
                 $el.removeEventListener(event, oldMethod);
 
             }
 
             if (newMethod) {
 
-                console.log('ADDING NEW METHOD FROM UPDATE', event, newMethod);
                 this.addEventListenerFromProp($el, event, newMethod);
 
             }
@@ -205,8 +197,6 @@ export default class EzVDOM {
         properties.forEach(name => {
 
             if (this.isEventProp(name)) {
-
-                console.log('-- ez-on event being updated', $el, name, newProps, oldProps);
 
                 const event = this.extractEventName(name);
 
@@ -231,8 +221,6 @@ export default class EzVDOM {
 
         }
 
-        console.log('adding event listener from prop', $el, name, method);
-
         $el.addEventListener(
             event,
             method
@@ -251,10 +239,6 @@ export default class EzVDOM {
                 if (this.isEventProp(name)) {
 
                     const method = props[name];
-
-                    if(name == 'ez-on-click') {
-                        console.log('ADDING EVENT LISTENER', $el, name, method);
-                    }
 
                     this.addEventListenerFromProp($el, name, method);
 
