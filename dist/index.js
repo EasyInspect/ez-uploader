@@ -149,14 +149,6 @@ function h(type, props) {
 
             delete props[prop];
         }
-
-        if (typeof props['ez-on-click'] !== 'undefined') {
-
-            var _prop = 'ez-on-click';
-            var method = props[_prop];
-
-            props[_prop] = method.bind(EzUploader);
-        }
     }
 
     for (var _len = arguments.length, children = Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
@@ -511,7 +503,6 @@ var EzUploader = function (_EzVDOM) {
     }, {
         key: 'getFileOptionsVDOM',
         value: function getFileOptionsVDOM(file) {
-            var _this4 = this;
 
             var options = [];
 
@@ -529,9 +520,7 @@ var EzUploader = function (_EzVDOM) {
 
                 options.push(h(
                     'div',
-                    { 'ez-on-click': function ezOnClick() {
-                            return _this4.removeFile(file);
-                        }, className: 'ez-uploader__modal-button--small ez-uploader__modal-button-red' },
+                    { 'ez-on-click': this.removeFile.bind(this, file), className: 'ez-uploader__modal-button--small ez-uploader__modal-button-red' },
                     'remove'
                 ));
             }
@@ -551,7 +540,7 @@ var EzUploader = function (_EzVDOM) {
 
             options.push(h(
                 'div',
-                { 'ez-show-flex': !this.files.length, className: 'ez-uploader__modal-placeholder' },
+                { forceUpdate: true, 'ez-show-flex': !this.files.length, className: 'ez-uploader__modal-placeholder' },
                 h(
                     'h2',
                     null,
@@ -564,7 +553,7 @@ var EzUploader = function (_EzVDOM) {
                 ),
                 h(
                     'div',
-                    { 'ez-on-click': this.browseFiles, className: 'ez-uploader__modal-button ez-uploader__modal-button-wet-asphalt' },
+                    { 'ez-on-click': this.browseFiles.bind(this), className: 'ez-uploader__modal-button ez-uploader__modal-button-wet-asphalt' },
                     'Click here'
                 )
             ));
@@ -613,13 +602,13 @@ var EzUploader = function (_EzVDOM) {
 
                 options.push(h(
                     'div',
-                    { forceUpdate: true, 'ez-on-click': this.removeAllFiles, className: 'ez-uploader__modal-button' },
+                    { 'ez-on-click': this.removeAllFiles.bind(this), className: 'ez-uploader__modal-button' },
                     'Remove all files'
                 ));
 
                 options.push(h(
                     'div',
-                    { forceUpdate: true, 'ez-on-click': this.browseFiles, className: 'ez-uploader__modal-button ez-uploader__modal-button-wet-asphalt' },
+                    { 'ez-on-click': this.browseFiles.bind(this), className: 'ez-uploader__modal-button ez-uploader__modal-button-wet-asphalt' },
                     'Add more files'
                 ));
             }
@@ -644,20 +633,20 @@ var EzUploader = function (_EzVDOM) {
 
                     options.push(h(
                         'div',
-                        { 'ez-on-click': this.closeUploader, className: 'ez-uploader__modal-button' },
+                        { 'ez-on-click': this.closeUploader.bind(this), className: 'ez-uploader__modal-button' },
                         'Close'
                     ));
 
                     options.push(h(
                         'div',
-                        { 'ez-on-click': this.resetModal, className: 'ez-uploader__modal-button ez-uploader__modal-button-blue' },
+                        { 'ez-on-click': this.resetModal.bind(this), className: 'ez-uploader__modal-button ez-uploader__modal-button-blue' },
                         'Upload more'
                     ));
                 } else if (this.uploader.isUploading()) {
 
                     options.push(h(
                         'div',
-                        { 'ez-on-click': this.pauseUploading,
+                        { 'ez-on-click': this.pauseUploading.bind(this),
                             className: 'ez-uploader__modal-button ez-uploader__modal-button-orange' },
                         'Pause uploading'
                     ));
@@ -667,7 +656,7 @@ var EzUploader = function (_EzVDOM) {
 
                         options.push(h(
                             'div',
-                            { 'ez-on-click': this.startUploading,
+                            { 'ez-on-click': this.startUploading.bind(this),
                                 className: 'ez-uploader__modal-button ez-uploader__modal-button-blue' },
                             'Resume uploading'
                         ));
@@ -675,7 +664,7 @@ var EzUploader = function (_EzVDOM) {
 
                         options.push(h(
                             'div',
-                            { 'ez-on-click': this.startUploading,
+                            { 'ez-on-click': this.startUploading.bind(this),
                                 className: 'ez-uploader__modal-button ez-uploader__modal-button-blue' },
                             'Start uploading'
                         ));
@@ -714,7 +703,7 @@ var EzUploader = function (_EzVDOM) {
                         ),
                         h(
                             'div',
-                            { 'ez-on-click': this.closeUploader, className: 'ez-uploader__modal-cross' },
+                            { 'ez-on-click': this.closeUploader.bind(this), className: 'ez-uploader__modal-cross' },
                             h('span', { className: 'ez-uploader__modal-cross-line' }),
                             h('span', { className: 'ez-uploader__modal-cross-line' })
                         )
@@ -2056,20 +2045,19 @@ var EzVDOM = function () {
 
                         if ($el && $el.addEventListener) {
 
-                                /*
-                                const newMethod = this[newMethodName];
-                                const oldMethod = this[oldMethodName];
-                                */
-
-                                console.log('methods', newMethod === oldMethod, newMethod, oldMethod);
+                                console.log('methods', newMethod === oldMethod);
+                                console.log('-', newMethod);
+                                console.log('-', oldMethod);
 
                                 if (oldMethod) {
 
-                                        $el.removeEventListener(event, oldMethod.bind(this));
+                                        console.log('removing old method', event, oldMethod);
+                                        $el.removeEventListener(event, oldMethod);
                                 }
 
                                 if (newMethod) {
 
+                                        console.log('ADDING NEW METHOD FROM UPDATE', event, newMethod);
                                         this.addEventListenerFromProp($el, event, newMethod);
                                 }
                         }
@@ -2108,7 +2096,9 @@ var EzVDOM = function () {
                                 method = this[method].bind(this);
                         }
 
-                        $el.addEventListener(event, method.bind(this));
+                        console.log('adding event listener from prop', $el, name, method);
+
+                        $el.addEventListener(event, method);
                 }
         }, {
                 key: 'addEventListenersFromProps',
@@ -2124,6 +2114,10 @@ var EzVDOM = function () {
                                         if (_this4.isEventProp(name)) {
 
                                                 var method = props[name];
+
+                                                if (name == 'ez-on-click') {
+                                                        console.log('ADDING EVENT LISTENER', $el, name, method);
+                                                }
 
                                                 _this4.addEventListenerFromProp($el, name, method);
                                         }

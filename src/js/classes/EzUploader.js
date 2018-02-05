@@ -18,15 +18,6 @@ function h(type, props, ...children) {
 
         }
 
-        if (typeof props['ez-on-click'] !== 'undefined') {
-
-            const prop      = 'ez-on-click';
-            const method    = props[prop];
-
-            props[prop] = method.bind(EzUploader)
-
-        }
-
     }
 
     return {
@@ -34,6 +25,7 @@ function h(type, props, ...children) {
         props,
         children: children.length ? [].concat(...children) : []
     };
+
 }
 
 export default class EzUploader extends EzVDOM {
@@ -372,7 +364,7 @@ export default class EzUploader extends EzVDOM {
         } else if (!file.isComplete()) {
 
             options.push(
-                <div ez-on-click={() => this.removeFile(file)} className="ez-uploader__modal-button--small ez-uploader__modal-button-red">
+                <div ez-on-click={this.removeFile.bind(this, file)} className="ez-uploader__modal-button--small ez-uploader__modal-button-red">
                     remove
                 </div>
             );
@@ -396,10 +388,10 @@ export default class EzUploader extends EzVDOM {
         }
 
         options.push(
-            <div ez-show-flex={!this.files.length} className="ez-uploader__modal-placeholder">
+            <div forceUpdate ez-show-flex={!this.files.length} className="ez-uploader__modal-placeholder">
                 <h2>Drag and drop files</h2>
                 <p>or</p>
-                <div ez-on-click={this.browseFiles} className="ez-uploader__modal-button ez-uploader__modal-button-wet-asphalt">Click here</div>
+                <div ez-on-click={this.browseFiles.bind(this)} className="ez-uploader__modal-button ez-uploader__modal-button-wet-asphalt">Click here</div>
             </div>
         );
 
@@ -437,13 +429,13 @@ export default class EzUploader extends EzVDOM {
         if (this.uploader && this.uploader.progress() < 1 && !this.uploader.isUploading() && this.files.length) {
 
             options.push(
-                <div forceUpdate ez-on-click={this.removeAllFiles} className="ez-uploader__modal-button">
+                <div ez-on-click={this.removeAllFiles.bind(this)} className="ez-uploader__modal-button">
                     Remove all files
                 </div>
             );
 
             options.push(
-                <div forceUpdate ez-on-click={this.browseFiles} className="ez-uploader__modal-button ez-uploader__modal-button-wet-asphalt">
+                <div ez-on-click={this.browseFiles.bind(this)} className="ez-uploader__modal-button ez-uploader__modal-button-wet-asphalt">
                     Add more files
                 </div>
             );
@@ -467,13 +459,13 @@ export default class EzUploader extends EzVDOM {
                 );
 
                 options.push(
-                    <div ez-on-click={this.closeUploader} className="ez-uploader__modal-button">
+                    <div ez-on-click={this.closeUploader.bind(this)} className="ez-uploader__modal-button">
                         Close
                     </div>
                 );
 
                 options.push(
-                    <div ez-on-click={this.resetModal} className="ez-uploader__modal-button ez-uploader__modal-button-blue">
+                    <div ez-on-click={this.resetModal.bind(this)} className="ez-uploader__modal-button ez-uploader__modal-button-blue">
                         Upload more
                     </div>
                 );
@@ -481,7 +473,7 @@ export default class EzUploader extends EzVDOM {
             } else if (this.uploader.isUploading()) {
 
                 options.push(
-                    <div ez-on-click={this.pauseUploading}
+                    <div ez-on-click={this.pauseUploading.bind(this)}
                          className="ez-uploader__modal-button ez-uploader__modal-button-orange">
                         Pause uploading
                     </div>
@@ -492,7 +484,7 @@ export default class EzUploader extends EzVDOM {
                 if (this.uploader.progress()) {
 
                     options.push(
-                        <div ez-on-click={this.startUploading}
+                        <div ez-on-click={this.startUploading.bind(this)}
                              className="ez-uploader__modal-button ez-uploader__modal-button-blue">
                             Resume uploading
                         </div>
@@ -501,7 +493,7 @@ export default class EzUploader extends EzVDOM {
                 } else if(this.files.length) {
 
                     options.push(
-                        <div ez-on-click={this.startUploading}
+                        <div ez-on-click={this.startUploading.bind(this)}
                              className="ez-uploader__modal-button ez-uploader__modal-button-blue">
                             Start uploading
                         </div>
@@ -537,7 +529,7 @@ export default class EzUploader extends EzVDOM {
                         <div className="ez-uploader__modal-title">
                             {this.getTitleVDOM()}
                         </div>
-                        <div ez-on-click={this.closeUploader} className="ez-uploader__modal-cross">
+                        <div ez-on-click={this.closeUploader.bind(this)} className="ez-uploader__modal-cross">
                             <span className="ez-uploader__modal-cross-line"></span>
                             <span className="ez-uploader__modal-cross-line"></span>
                         </div>
