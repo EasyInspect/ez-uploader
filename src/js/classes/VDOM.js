@@ -90,7 +90,11 @@ export default class EzVDOM {
 
     updateProp($el, name, newVal, oldVal) {
 
-        if (!newVal) {
+        if (this.isConditionalProp(name)) {
+
+            this.setElementProp($el, name, newVal);
+
+        }else if (!newVal) {
 
             this.removeProp($el, name, oldVal);
 
@@ -110,14 +114,20 @@ export default class EzVDOM {
 
             Object.keys(props).forEach(name => {
 
-                const newProp = newProps && newProps[name] || null;
-                const oldProp = oldProps && oldProps[name] || null;
+                const newProp = newProps && !this.isNil(newProps[name]) && newProps[name] || null;
+                const oldProp = oldProps && !this.isNil(oldProps[name]) && oldProps[name] || null;
 
                 this.updateProp($el, name, newProp, oldProp);
 
             });
 
         }
+
+    }
+
+    isConditionalProp(name) {
+
+        return /^ez-show/.test(name);
 
     }
 
@@ -145,6 +155,73 @@ export default class EzVDOM {
 
     }
 
+    extractConditionalDisplayType(name) {
+
+        if (name === 'ez-show') {
+
+            return name.replace(/^ez-show/, '').toLowerCase();
+
+        } else {
+
+            return name.replace(/^ez-show-/, '').toLowerCase();
+
+        }
+
+    }
+
+    updateEventListenerFromProp($el, event, newMethod, oldMethod) {
+
+        console.log('updating event listener from prop', $el, event, newMethod, oldMethod);
+
+        if ($el && $el.addEventListener) {
+
+            /*
+            const newMethod = this[newMethodName];
+            const oldMethod = this[oldMethodName];
+            */
+
+            console.log('methods', newMethod === oldMethod, newMethod, oldMethod);
+
+            if (oldMethod) {
+
+                $el.removeEventListener(event, oldMethod.bind(this));
+
+            }
+
+            if (newMethod) {
+
+                this.addEventListenerFromProp($el, event, newMethod)
+
+            }
+
+        }
+
+    }
+
+    updateEventListenersFromProp($el, newProps, oldProps) {
+
+        const allProps      = Object.assign({}, oldProps, newProps);
+        const properties    = Object.keys(allProps);
+
+        properties.forEach(name => {
+
+            if (this.isEventProp(name)) {
+
+                console.log('-- ez-on event being updated', $el, name, newProps, oldProps);
+
+                const event = this.extractEventName(name);
+
+                const newMethod = newProps[name];
+                const oldMethod = oldProps[name];
+
+                this.updateEventListenerFromProp($el, event, newMethod, oldMethod);
+
+            }
+
+        })
+
+    }
+
     addEventListenerFromProp($el, name, method) {
 
         const event = this.extractEventName(name);
@@ -157,7 +234,7 @@ export default class EzVDOM {
 
         $el.addEventListener(
             event,
-            method
+            method.bind(this)
         );
 
     }
@@ -224,56 +301,15 @@ export default class EzVDOM {
         )
 
     }
-    /*
-
-    updateElement($parent, newNode, oldNode, index = 0) {
-
-        if (this.isNil(oldNode)) {
-            $parent.appendChild(
-                this.createElement(newNode)
-            );
-        } else if (this.isNil(newNode)) {
-            $parent.removeChild(
-                $parent.childNodes[index]
-            );
-        } else if (this.changed(newNode, oldNode)) {
-            $parent.replaceChild(
-                this.createElement(newNode),
-                $parent.childNodes[index]
-            );
-        } else if (newNode.type) {
-            this.updateProps(
-                $parent.childNodes[index],
-                newNode.props,
-                oldNode.props
-            );
-            const newLength = newNode.children.length;
-            const oldLength = oldNode.children.length;
-
-            for (let i = 0; i < newLength || i < oldLength; i++) {
-
-                this.updateElement(
-                    $parent.childNodes[index],
-                    newNode.children[i],
-                    oldNode.children[i],
-                    i
-                );
-
-            }
-        }
-    }
-    */
 
     updateElement($parent, newNode, oldNode, $el = $parent.childNodes[0]) {
 
-        /*
-        console.log('-- update element');
+        /*console.log('-- update element');
         console.log($parent);
         console.log(newNode);
         console.log(oldNode);
         console.log($el);
-        console.log('//--');
-        */
+        console.log('//--');*/
 
         if (this.isNil(oldNode)) {
 
@@ -297,6 +333,7 @@ export default class EzVDOM {
         } else if (newNode.type) {
 
             this.updateProps($el, newNode.props, oldNode.props);
+            this.updateEventListenersFromProp($el, newNode.props, oldNode.props);
 
             const max = Math.max(newNode.children.length, oldNode.children.length);
 
