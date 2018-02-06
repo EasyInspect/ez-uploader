@@ -14,7 +14,7 @@
 </head>
 <body>
 
-<button onclick="uploader.openUploader()">open</button>
+<button onclick="uploader.open()">open</button>
 
 <script>
 
@@ -23,14 +23,15 @@
             thumbnail: false
         },
         upload: {
-            url: `https://datasets.local/api/v1/teams/kekker/datasets/rgb/62c5eef4-b46d-47b4-a95c-bc2b80a42425/upload/resumable`,
+            target: `https://datasets.local/api/v1/teams/kekker/datasets/rgb/62c5eef4-b46d-47b4-a95c-bc2b80a42425/upload/resumable`,
             headers: {
                 Authorization: `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjExNjQ3YmRhMzQ0NTkzZDZmNmM5M2U4ZTUxNWUwODQ5ODRiY2Y1ZDZkN2Y4NzRlODBhYmZiYTg5YTQwZjRhNGVmOGE4ODBjYjZiOGFmYzQ4In0.eyJhdWQiOiIzIiwianRpIjoiMTE2NDdiZGEzNDQ1OTNkNmY2YzkzZThlNTE1ZTA4NDk4NGJjZjVkNmQ3Zjg3NGU4MGFiZmJhODlhNDBmNGE0ZWY4YTg4MGNiNmI4YWZjNDgiLCJpYXQiOjE1MTc1OTA4MDEsIm5iZiI6MTUxNzU5MDgwMSwiZXhwIjoxNTQ5MTI2ODAxLCJzdWIiOiIwOGVkNjgwMS01YzIxLTQwNzktOTUyZS1lZTgzODNlNDkxZTMiLCJzY29wZXMiOltdfQ.jClTIh9GqhQOJpvRLgXLieszwi85rNH-F1GvhEeNDWOr2sPsdqjXX8qp_SgPrWcazQWj22n7NkQ09xf2RmyI0Bw7QUZo1toBYBVTP1yfpLNsxmTsJkxKktgKVE9uVmPky8zEZ0YcDdUCVp5Bz88_j9s3ikjlk9KXDvhjubLNQiCNBEWU1425P73PmYSu_kQQykpTM3UoUkh-c8zAf-g6v1XDfxm4iL62YRLH4MkCcOqPFd3ZDNuET9DxzXd4mNfMkzKUUZMu4K6VYs-xP-5dpX41o2npIFjzsQ351msSd8aSmq-W1JsgkiscCgoOFHv2krQ7p7m3GSsPlhBaRXiBbVr33VNl79WLczpppQqElFyFIhP6IHSk97qXPocmbz1PfmccMH6bZJau0sbggQhKQVopKs1zdQxKwT3A3arMXjvmGs4akMb9WGNrHL7XYwwbZrAW6ACz8O3_lBzKfgS72bjxP8dRnebKjvT06pXLojja07Rhmv_Y3g4tPArsoYNQFyOpyXe13TsjdkVWYBr3COb-YUH1sKh1eKKpYW1VyPVyosGJ6b59SuP2Q-u0572smjlGfPmo9IMXdzEH46nhT8mBmb2e2RemjZGoO8lulxSQxxU7aOmcFyWKf5Nn4pYhscR6_EUEgmsK6eLo_f_5_kvmXLOn4cWTKOf_C1fFWIo`
-            }
+            },
+            simultaneousUploads: 20
         }
     });
 
-    uploader.openUploader();
+    uploader.open();
 
 </script>
 

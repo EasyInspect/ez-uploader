@@ -43,6 +43,11 @@
   }
 }
 
+.ez-uploader__modal-header-error {
+  margin-top: 5px;
+  color: #e74c3c;
+}
+
 .ez-uploader__modal-cross {
   position: absolute;
   right: 10px;
@@ -116,16 +121,29 @@
   //padding-bottom: 10px;
   //margin-bottom: 10px;
   border-bottom: 1px solid #dedede;
-  //height: 75px;
+  //max-height: 60px;
   display: flex;
+}
+
+.ez-uploader__modal-file:nth-child(2) {
+  border-top: none;
 }
 
 .ez-uploader__modal-file--error {
   color: #e74c3c;
 }
+.ez-uploader__modal-file--success {
+
+  .ez-uploader__modal-file-progress-inner{
+    background: #27ae60;
+  }
+
+}
 
 .ez-uploader__modal-file-image {
-  width: 75px;
+  width: 60px;
+  height: 50px;
+  margin: 5px 0;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -141,8 +159,10 @@
 
 .ez-uploader__modal-file-text {
   flex-grow: 1;
-  padding: 10px;
   display: flex;
+  flex-wrap: wrap;
+  padding: 10px 25px 10px 10px;
+  word-break: break-all;
 }
 
 .ez-uploader__modal-file-name {
@@ -150,13 +170,15 @@
 }
 
 .ez-uploader__modal-file-size {
-  opacity: 0.8;
+  opacity: 0.7;
   margin-left: 10px;
-  font-size: 0.7em;
+  font-size: 0.8em;
+  vertical-align: top;
 }
 .ez-uploader__modal-file-error {
   width: 100%;
   margin-top: 5px;
+  font-size: 0.8em;
 }
 
 .ez-uploader__modal-file-progress {
@@ -178,14 +200,15 @@
 }
 
 .ez-uploader__modal-footer {
+  padding: 15px 15px 0;
   border-top: 1px solid #dedede;
   display: flex;
   justify-content: space-between;
 }
-
+.ez-uploader__modal-footer .ez-uploader__modal-button {
+  margin-bottom: 15px;
+}
 .ez-uploader__modal-footer-left {
-  padding: 15px;
-  display: inline-block;
   text-align: left;
 }
 
@@ -194,8 +217,6 @@
 }
 
 .ez-uploader__modal-footer-right {
-  padding: 15px;
-  display: inline-block;
   text-align: right;
 }
 
@@ -210,7 +231,8 @@
   border-radius: 5px;
   display: inline-block;
   cursor: pointer;
-  transition: all 150ms;
+  transition: background 150ms;
+  text-align: center;
 }
 
 .ez-uploader__modal-button--small {
@@ -231,11 +253,11 @@
 }
 
 .ez-uploader__modal-button-green {
-  background: #2ecc71;
+  background: #27ae60;
 }
 
 .ez-uploader__modal-button-green:hover {
-  background: #27ae60;
+  background: #268944;
 }
 
 .ez-uploader__modal-button-lightblue {
@@ -274,7 +296,7 @@
   font-size: 20px;
   padding: 5px;
   cursor: pointer;
-  transition: all 150ms;
+  transition: color 150ms;
   color: darkgrey;
   margin-left: 10px;
 }
@@ -305,4 +327,41 @@
 
 .ez-uploader__modal-icon-button-wet-asphalt:hover {
   color: #2c3e50;
+}
+
+@media screen and (max-width: 768px) {
+
+  .ez-uploader__backdrop {
+    padding: 0;
+  }
+  .ez-uploader__modal {
+    margin: 0;
+    border-radius: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .ez-uploader__modal-body {
+    flex-grow: 1;
+  }
+  .ez-uploader__modal-footer {
+    padding: 15px;
+    flex-direction: column;
+  }
+
+  .ez-uploader__modal-footer-info {
+    display: none;
+  }
+
+  .ez-uploader__modal-footer-left, .ez-uploader__modal-footer-right {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+
+    .ez-uploader__modal-button {
+      margin: 0 0 5px 0;
+    }
+
+  }
+
 }

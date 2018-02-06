@@ -36,6 +36,10 @@
   .ez-uploader__modal-title p {
     margin: 0; }
 
+.ez-uploader__modal-header-error {
+  margin-top: 5px;
+  color: #e74c3c; }
+
 .ez-uploader__modal-cross {
   position: absolute;
   right: 10px;
@@ -110,11 +114,19 @@
   display: -ms-flexbox;
   display: flex; }
 
+.ez-uploader__modal-file:nth-child(2) {
+  border-top: none; }
+
 .ez-uploader__modal-file--error {
   color: #e74c3c; }
 
+.ez-uploader__modal-file--success .ez-uploader__modal-file-progress-inner {
+  background: #27ae60; }
+
 .ez-uploader__modal-file-image {
-  width: 75px;
+  width: 60px;
+  height: 50px;
+  margin: 5px 0;
   overflow: hidden;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -135,19 +147,24 @@
   -webkit-box-flex: 1;
       -ms-flex-positive: 1;
           flex-grow: 1;
-  padding: 10px;
   display: -webkit-box;
   display: -ms-flexbox;
-  display: flex; }
+  display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  padding: 10px 25px 10px 10px;
+  word-break: break-all; }
 
 .ez-uploader__modal-file-size {
-  opacity: 0.8;
+  opacity: 0.7;
   margin-left: 10px;
-  font-size: 0.7em; }
+  font-size: 0.8em;
+  vertical-align: top; }
 
 .ez-uploader__modal-file-error {
   width: 100%;
-  margin-top: 5px; }
+  margin-top: 5px;
+  font-size: 0.8em; }
 
 .ez-uploader__modal-file-progress {
   height: 10px;
@@ -172,6 +189,7 @@
           justify-content: center; }
 
 .ez-uploader__modal-footer {
+  padding: 15px 15px 0;
   border-top: 1px solid #dedede;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -180,17 +198,16 @@
       -ms-flex-pack: justify;
           justify-content: space-between; }
 
+.ez-uploader__modal-footer .ez-uploader__modal-button, .ez-uploader__modal-footer .ez-uploader__modal-button--small {
+  margin-bottom: 15px; }
+
 .ez-uploader__modal-footer-left {
-  padding: 15px;
-  display: inline-block;
   text-align: left; }
 
 .ez-uploader__modal-footer-left .ez-uploader__modal-button, .ez-uploader__modal-footer-left .ez-uploader__modal-button--small {
   margin-right: 10px; }
 
 .ez-uploader__modal-footer-right {
-  padding: 15px;
-  display: inline-block;
   text-align: right; }
 
 .ez-uploader__modal-footer-right .ez-uploader__modal-button, .ez-uploader__modal-footer-right .ez-uploader__modal-button--small {
@@ -203,8 +220,9 @@
   border-radius: 5px;
   display: inline-block;
   cursor: pointer;
-  -webkit-transition: all 150ms;
-  transition: all 150ms; }
+  -webkit-transition: background 150ms;
+  transition: background 150ms;
+  text-align: center; }
 
 .ez-uploader__modal-button--small {
   padding: 5px 10px; }
@@ -219,10 +237,10 @@
   background: #176496; }
 
 .ez-uploader__modal-button-green {
-  background: #2ecc71; }
+  background: #27ae60; }
 
 .ez-uploader__modal-button-green:hover {
-  background: #27ae60; }
+  background: #268944; }
 
 .ez-uploader__modal-button-lightblue {
   background: #3498db; }
@@ -252,8 +270,8 @@
   font-size: 20px;
   padding: 5px;
   cursor: pointer;
-  -webkit-transition: all 150ms;
-  transition: all 150ms;
+  -webkit-transition: color 150ms;
+  transition: color 150ms;
   color: darkgrey;
   margin-left: 10px; }
 
@@ -277,3 +295,43 @@
 
 .ez-uploader__modal-icon-button-wet-asphalt:hover {
   color: #2c3e50; }
+
+@media screen and (max-width: 768px) {
+  .ez-uploader__backdrop {
+    padding: 0; }
+  .ez-uploader__modal {
+    margin: 0;
+    border-radius: 0;
+    height: 100%;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column; }
+  .ez-uploader__modal-body {
+    -webkit-box-flex: 1;
+        -ms-flex-positive: 1;
+            flex-grow: 1; }
+  .ez-uploader__modal-footer {
+    padding: 15px;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column; }
+  .ez-uploader__modal-footer-info {
+    display: none; }
+  .ez-uploader__modal-footer-left, .ez-uploader__modal-footer-right {
+    -webkit-box-flex: 1;
+        -ms-flex-positive: 1;
+            flex-grow: 1;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column; }
+    .ez-uploader__modal-footer-left .ez-uploader__modal-button, .ez-uploader__modal-footer-left .ez-uploader__modal-button--small, .ez-uploader__modal-footer-right .ez-uploader__modal-button, .ez-uploader__modal-footer-right .ez-uploader__modal-button--small {
+      margin: 0 0 5px 0; } }

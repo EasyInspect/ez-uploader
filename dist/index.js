@@ -176,15 +176,23 @@ var EzUploader = function (_EzVDOM) {
 
         _this.settings = {
             upload: Object.assign({}, {
-                url: null,
-                headers: {}
+                target: null,
+                headers: {},
+                minFileSizeErrorCallback: _this.minFileSizeErrorCallback.bind(_this),
+                maxFileSizeErrorCallback: _this.maxFileSizeErrorCallback.bind(_this),
+                fileType: [],
+                fileTypeErrorCallback: _this.fileTypeErrorCallback.bind(_this)
             }, upload),
             ui: Object.assign({}, {
                 thumbnail: false
             }, ui)
         };
 
+        _this.uploading = false;
         _this.uploader = null;
+        _this.error = null;
+        _this.fileErrors = {};
+        _this.mappedFiles = {};
 
         _this.addUploaderToDOM();
         _this.addResumable();
@@ -199,24 +207,86 @@ var EzUploader = function (_EzVDOM) {
         key: 'addResumable',
         value: function addResumable() {
 
-            var browse = document.querySelectorAll("[ez-uploader-browse]");
+            var settings = this.settings.upload;
+            var file = document.querySelectorAll("[ez-uploader-browse]");
+            var directory = document.querySelectorAll("[ez-uploader-browse-directory]");
             var drop = document.querySelectorAll("[ez-uploader-drop]")[0];
 
-            this.uploader = new _resumablejs2.default({
-                target: this.settings.upload.url,
-                headers: this.settings.upload.headers
-            });
+            this.uploader = new _resumablejs2.default(settings);
 
-            this.uploader.assignBrowse(browse);
+            this.uploader.assignBrowse(file);
+            this.uploader.assignBrowse(directory, true);
             this.uploader.assignDrop(drop);
             this.addResumableEventListeners();
+        }
+    }, {
+        key: 'clearError',
+        value: function clearError() {
+
+            this.error = null;
+        }
+    }, {
+        key: 'clearFileErrors',
+        value: function clearFileErrors() {
+
+            this.fileErrors = {};
+        }
+    }, {
+        key: 'maxFileSizeErrorCallback',
+        value: function maxFileSizeErrorCallback(file, errorCount) {
+
+            //console.log(file);
+            this.error = file.name + ' is too large, the maximum file size allowed is ' + this.convertBytesToMB(this.settings.upload.maxFileSize) + 'MB';
+            this.updateDOM();
+        }
+    }, {
+        key: 'minFileSizeErrorCallback',
+        value: function minFileSizeErrorCallback(file, errorCount) {
+
+            //console.log(file);
+            this.error = file.name + ' is too small, the minimum file size allowed is ' + this.convertBytesToMB(this.settings.upload.minFileSize) + 'MB';
+            this.updateDOM();
+        }
+    }, {
+        key: 'fileTypeErrorCallback',
+        value: function fileTypeErrorCallback(file, errorCount) {
+
+            //console.log(file);
+
+            var allowedTypes = this.settings.upload.fileType;
+            var allowedTypesString = allowedTypes.reduce(function (result, type, index) {
+
+                if (index == allowedTypes.length - 2) {
+                    result += type + ' or ';
+                } else if (index == allowedTypes.length - 1) {
+                    result += '' + type;
+                } else {
+                    result += type + ', ';
+                }
+
+                return result;
+            }, '');
+
+            this.error = file.name + ' isn\'t an allowed file type, please upload files of type ' + allowedTypesString;
+            this.updateDOM();
         }
     }, {
         key: 'browseFiles',
         value: function browseFiles() {
 
-            console.log('browse files boi');
+            //console.log('browse files boi');
+
             var browseButton = document.querySelectorAll("[ez-uploader-browse]")[0];
+
+            browseButton.dispatchEvent(new Event('click'));
+        }
+    }, {
+        key: 'browseDirectory',
+        value: function browseDirectory() {
+
+            //console.log('browse files boi');
+
+            var browseButton = document.querySelectorAll("[ez-uploader-browse-directory]")[0];
 
             browseButton.dispatchEvent(new Event('click'));
         }
@@ -227,9 +297,9 @@ var EzUploader = function (_EzVDOM) {
 
             window.addEventListener('keyup', function (e) {
 
-                if (e.keyCode === 27) {
+                if (e.keyCode === 27 && 1 < 1) {
 
-                    _this2.closeUploader();
+                    _this2.close();
                 }
             });
         }
@@ -240,6 +310,7 @@ var EzUploader = function (_EzVDOM) {
             this.uploader.on('filesAdded', this.onFilesAdded.bind(this));
             this.uploader.on('fileSuccess', this.onFileSuccess.bind(this));
             this.uploader.on('fileProgress', this.onFileProgress.bind(this));
+            this.uploader.on('fileRetry', this.onFileRetry.bind(this));
             this.uploader.on('fileError', this.onFileError.bind(this));
             this.uploader.on('uploadStart', this.onUploadStart.bind(this));
             this.uploader.on('complete', this.onComplete.bind(this));
@@ -257,7 +328,7 @@ var EzUploader = function (_EzVDOM) {
         value: function onFilesAdded(files, event) {
             var _this3 = this;
 
-            console.log("multiple added", files, event);
+            //console.log("multiple added", files, event);
 
             if (this.settings.ui.thumbnail) {
 
@@ -271,74 +342,103 @@ var EzUploader = function (_EzVDOM) {
                     fileReader.onload = function (event) {
 
                         _this3.mappedFiles[file.uniqueIdentifier].src = event.target.result;
-                        console.log('update dom from on load');
+                        //console.log('update dom from on load');
                         _this3.updateDOM();
                     };
                 });
             }
 
-            console.log('update dom from added');
+            //console.log('update dom from added');
+            this.clearError();
             this.updateDOM();
         }
     }, {
         key: 'onFileSuccess',
         value: function onFileSuccess(file, event) {
-            console.log("onFileSuccess", file, event);
+            //console.log("onFileSuccess", file, event);
+            delete this.fileErrors[file.uniqueIdentifier];
             this.updateDOM();
         }
     }, {
         key: 'onFileProgress',
         value: function onFileProgress(file, event) {
-            console.log("onFileProgress", file, event);
+            //console.log("onFileProgress", file, event);
+            //this.updateDOM();
+        }
+    }, {
+        key: 'onFileRetry',
+        value: function onFileRetry(file, event) {
+            //console.log("onFileRetry", file, event);
             this.updateDOM();
         }
     }, {
         key: 'onFileError',
-        value: function onFileError(file, event) {
-            console.log("onFileError", file, event);
+        value: function onFileError(file, error) {
+
+            //console.log('on error', error);
+            var message = '';
+
+            try {
+
+                //console.log('setting error message try', JSON.parse(JSON.stringify(error)), JSON.parse(JSON.stringify(error)).message);
+                message = JSON.parse(JSON.stringify(error)).message || 'An error occured';
+            } catch (e) {
+
+                //console.log('setting error message catch');
+                message = 'An error occurred';
+            }
+
+            //console.log('final error message', message);
+
+            this.fileErrors[file.uniqueIdentifier] = {
+                file: file,
+                error: message
+            };
+
             this.updateDOM();
         }
     }, {
         key: 'onUploadStart',
         value: function onUploadStart(file, event) {
-            console.log("onUploadStart", file, event);
+            //console.log("onUploadStart", file, event);
             this.updateDOM();
         }
     }, {
         key: 'onComplete',
         value: function onComplete(file, event) {
-            console.log("onComplete", file, event);
+            //console.log("onComplete", file, event);
+            this.uploading = false;
             this.updateDOM();
         }
     }, {
         key: 'onProgress',
         value: function onProgress(file, event) {
-            console.log("onProgress", file, event);
+            //console.log("onProgress", file, event);
             this.updateDOM();
         }
     }, {
         key: 'onError',
         value: function onError(file, event) {
-            console.log("onError", file, event);
+            //console.log("onError", file, event);
             this.updateDOM();
         }
     }, {
         key: 'onPause',
         value: function onPause(file, event) {
-            console.log("onPause", file, event);
+            //console.log("onPause", file, event);
             this.updateDOM();
         }
     }, {
         key: 'onCancel',
         value: function onCancel(file, event) {
-            console.log("onCancel", file, event);
+            //console.log("onCancel", file, event);
             this.updateDOM();
         }
     }, {
-        key: 'openUploader',
-        value: function openUploader() {
+        key: 'open',
+        value: function open() {
 
-            console.log('modal toggle', this.modal);
+            //console.log('modal toggle', this.modal);
 
             if (this.modal) {
 
@@ -346,10 +446,10 @@ var EzUploader = function (_EzVDOM) {
             }
         }
     }, {
-        key: 'closeUploader',
-        value: function closeUploader() {
+        key: 'close',
+        value: function close() {
 
-            console.log('modal toggle', this, this.modal);
+            //console.log('modal toggle', this, this.modal);
 
             if (this.modal) {
 
@@ -360,29 +460,35 @@ var EzUploader = function (_EzVDOM) {
         key: 'resetModal',
         value: function resetModal() {
 
+            this.close();
             this.removeAllFiles();
         }
     }, {
         key: 'startUploading',
         value: function startUploading() {
 
+            this.uploading = true;
+            this.clearError();
             this.uploader.upload();
+            this.updateDOM();
         }
     }, {
         key: 'pauseUploading',
         value: function pauseUploading() {
 
+            this.uploading = false;
             this.uploader.pause();
         }
     }, {
         key: 'removeFile',
         value: function removeFile(file) {
 
-            console.log('remove file', file.fileName);
+            //console.log('remove file', file.fileName);
+            delete this.fileErrors[file.uniqueIdentifier];
             this.uploader.removeFile(file);
-            console.log('files after remove', this.uploader.files);
+            //console.log('files after remove', this.uploader.files);
 
-            console.log('update dom from remove');
+            //console.log('update dom from remove');
             this.updateDOM();
         }
     }, {
@@ -390,26 +496,30 @@ var EzUploader = function (_EzVDOM) {
         value: function pauseFile(file) {
 
             file.pause();
-            console.log('update dom from pause');
+            //console.log('update dom from pause');
             this.updateDOM();
         }
     }, {
         key: 'retryFile',
         value: function retryFile(file) {
 
-            file.abort();
-            console.log('update dom from retry');
+            this.uploading = true;
+            delete this.fileErrors[file.uniqueIdentifier];
+            file.retry();
+            //console.log('update dom from retry');
             this.updateDOM();
         }
     }, {
         key: 'removeAllFiles',
         value: function removeAllFiles() {
 
-            console.log('remove all files');
+            //console.log('remove all files');
+            this.clearError();
+            this.clearFileErrors();
             this.uploader.cancel();
-            console.log('files after remove all', this.uploader.files);
+            //console.log('files after remove all', this.uploader.files);
 
-            console.log('update dom from remove all');
+            //console.log('update dom from remove all');
             this.updateDOM();
         }
     }, {
@@ -430,14 +540,16 @@ var EzUploader = function (_EzVDOM) {
             this.cachedVDOM = this.getVDOM();
             this.modal = this.createElement(this.cachedVDOM);
 
-            console.log('cached', this.cachedVDOM);
-            console.log('modal', this.modal);
+            //console.log('cached', this.cachedVDOM);
+            //console.log('modal', this.modal);
 
             document.body.appendChild(this.modal);
         }
     }, {
         key: 'getTitleVDOM',
         value: function getTitleVDOM() {
+
+            //console.log('-- getting title dom', this.uploading);
 
             if (!this.files.length) {
 
@@ -446,7 +558,7 @@ var EzUploader = function (_EzVDOM) {
                     null,
                     'Select some files to get started'
                 );
-            } else if (this.uploader.isUploading()) {
+            } else if (this.uploading) {
 
                 var progress = (this.uploader.progress() * 100).toFixed(2);
 
@@ -455,6 +567,8 @@ var EzUploader = function (_EzVDOM) {
                     null,
                     'Uploading ',
                     this.files.length,
+                    ' ',
+                    this.files.length > 1 ? 'files' : 'file',
                     ' ',
                     h(
                         'span',
@@ -469,7 +583,7 @@ var EzUploader = function (_EzVDOM) {
                 return h(
                     'p',
                     null,
-                    'All images has been uploaded'
+                    'The upload has completed'
                 );
             } else {
 
@@ -478,23 +592,45 @@ var EzUploader = function (_EzVDOM) {
                     null,
                     'You\'ve chosen ',
                     this.files.length,
-                    ' files'
+                    ' ',
+                    this.files.length > 1 ? 'files' : 'file'
                 );
             }
+        }
+    }, {
+        key: 'getErrorVDOM',
+        value: function getErrorVDOM() {
+
+            if (this.error) {
+
+                return h(
+                    'div',
+                    { className: 'ez-uploader__modal-header-error' },
+                    this.error
+                );
+            }
+
+            return '';
         }
     }, {
         key: 'getFileImageVDOM',
         value: function getFileImageVDOM(file) {
 
-            if (this.settings.ui.thumbnail && this.mappedFiles[file.uniqueIdentifier] && this.mappedFiles[file.uniqueIdentifier].src) {
+            if (this.settings.ui.thumbnail) {
 
-                var src = this.mappedFiles[file.uniqueIdentifier].src;
+                if (this.mappedFiles[file.uniqueIdentifier] && this.mappedFiles[file.uniqueIdentifier].src) {
 
-                return h(
-                    'div',
-                    { className: 'ez-uploader__modal-file-image' },
-                    h('img', { src: src })
-                );
+                    var src = this.mappedFiles[file.uniqueIdentifier].src;
+
+                    return h(
+                        'div',
+                        { className: 'ez-uploader__modal-file-image' },
+                        h('img', { src: src })
+                    );
+                } else {
+
+                    return h('div', { className: 'ez-uploader__modal-file-image' });
+                }
             } else {
 
                 return '';
@@ -506,7 +642,7 @@ var EzUploader = function (_EzVDOM) {
 
             var options = [];
 
-            if (this.uploader && (this.uploader.isUploading() || this.uploader.progress())) {
+            if (this.uploader && !this.fileErrors[file.uniqueIdentifier] && (this.uploading || file.progress())) {
 
                 var progress = file.progress() * 100;
                 var style = 'width:' + progress + '%';
@@ -516,12 +652,19 @@ var EzUploader = function (_EzVDOM) {
                     { className: 'ez-uploader__modal-file-progress' },
                     h('div', { className: 'ez-uploader__modal-file-progress-inner', style: style })
                 ));
-            } else if (!file.isComplete()) {
+            } else if (!this.uploading && file.progress() === 0) {
 
                 options.push(h(
                     'div',
                     { 'ez-on-click': this.removeFile.bind(this, file), className: 'ez-uploader__modal-button--small ez-uploader__modal-button-red' },
                     'remove'
+                ));
+            } else if (this.fileErrors[file.uniqueIdentifier]) {
+
+                options.push(h(
+                    'div',
+                    { 'ez-on-click': this.retryFile.bind(this, file), className: 'ez-uploader__modal-button--small ez-uploader__modal-button-wet-asphalt' },
+                    'retry'
                 ));
             }
 
@@ -553,12 +696,19 @@ var EzUploader = function (_EzVDOM) {
                 ),
                 h(
                     'div',
-                    { 'ez-on-click': this.browseFiles.bind(this), className: 'ez-uploader__modal-button ez-uploader__modal-button-wet-asphalt' },
-                    'Click here'
+                    null,
+                    h(
+                        'div',
+                        { 'ez-on-click': this.browseDirectory.bind(this), className: 'ez-uploader__modal-button ez-uploader__modal-button-wet-asphalt', style: 'margin-right:5px' },
+                        'Add directory'
+                    ),
+                    h(
+                        'div',
+                        { 'ez-on-click': this.browseFiles.bind(this), className: 'ez-uploader__modal-button ez-uploader__modal-button-wet-asphalt' },
+                        'Add files'
+                    )
                 )
             ));
-
-            console.log('--- returning files', options, this.files);
 
             return options;
         }
@@ -566,9 +716,19 @@ var EzUploader = function (_EzVDOM) {
         key: 'getFileVDOM',
         value: function getFileVDOM(file) {
 
+            var stateClass = '';
+
+            if (this.fileErrors[file.uniqueIdentifier]) {
+
+                stateClass = 'ez-uploader__modal-file--error';
+            } else if (file.progress() === 1) {
+
+                stateClass = 'ez-uploader__modal-file--success';
+            }
+
             return h(
                 'div',
-                { className: 'ez-uploader__modal-file' },
+                { className: 'ez-uploader__modal-file ' + stateClass },
                 this.getFileImageVDOM(file),
                 h(
                     'div',
@@ -576,13 +736,18 @@ var EzUploader = function (_EzVDOM) {
                     h(
                         'div',
                         { className: 'ez-uploader__modal-file-name' },
-                        file.fileName
+                        file.fileName,
+                        h(
+                            'span',
+                            { className: 'ez-uploader__modal-file-size' },
+                            this.convertBytesToMB(file.size),
+                            ' MB'
+                        )
                     ),
                     h(
                         'div',
-                        { className: 'ez-uploader__modal-file-description' },
-                        this.convertBytesToMB(file.size),
-                        ' MB'
+                        { className: 'ez-uploader__modal-file-error' },
+                        this.fileErrors[file.uniqueIdentifier] ? this.fileErrors[file.uniqueIdentifier].error : ''
                     )
                 ),
                 h(
@@ -598,18 +763,27 @@ var EzUploader = function (_EzVDOM) {
 
             var options = [];
 
-            if (this.uploader && this.uploader.progress() < 1 && !this.uploader.isUploading() && this.files.length) {
+            if (this.uploader && !this.uploading && this.files.length) {
 
-                options.push(h(
-                    'div',
-                    { 'ez-on-click': this.removeAllFiles.bind(this), className: 'ez-uploader__modal-button' },
-                    'Remove all files'
-                ));
+                if (this.uploader.progress() < 1) {
+
+                    options.push(h(
+                        'div',
+                        { 'ez-on-click': this.removeAllFiles.bind(this), className: 'ez-uploader__modal-button' },
+                        'Clear'
+                    ));
+                }
 
                 options.push(h(
                     'div',
                     { 'ez-on-click': this.browseFiles.bind(this), className: 'ez-uploader__modal-button ez-uploader__modal-button-wet-asphalt' },
-                    'Add more files'
+                    'Add files'
+                ));
+
+                options.push(h(
+                    'div',
+                    { 'ez-on-click': this.browseDirectory.bind(this), className: 'ez-uploader__modal-button ez-uploader__modal-button-wet-asphalt' },
+                    'Add directory'
                 ));
             }
 
@@ -625,29 +799,52 @@ var EzUploader = function (_EzVDOM) {
 
                 if (this.uploader.progress() >= 1) {
 
-                    options.push(h(
-                        'span',
-                        null,
-                        'All of your images has now been uploaded'
-                    ));
+                    var errorCount = Object.keys(this.fileErrors).length;
+
+                    if (!errorCount) {
+
+                        options.push(h(
+                            'span',
+                            { className: 'ez-uploader__modal-footer-info' },
+                            'All of your images has now been uploaded'
+                        ));
+                    } else if (errorCount < this.files.length) {
+
+                        options.push(h(
+                            'span',
+                            { className: 'ez-uploader__modal-footer-info' },
+                            errorCount,
+                            ' out of ',
+                            this.files.length,
+                            ' ',
+                            this.files.length > 1 ? 'files' : 'file',
+                            ' failed to upload'
+                        ));
+                    } else if (errorCount === this.files.length) {
+
+                        options.push(h(
+                            'span',
+                            { className: 'ez-uploader__modal-footer-info' },
+                            'All of your files failed to upload'
+                        ));
+                    }
+
+                    /*options.push(
+                        <div ez-on-click={this.close.bind(this)} className="ez-uploader__modal-button">
+                            Close
+                        </div>
+                    );*/
 
                     options.push(h(
                         'div',
-                        { 'ez-on-click': this.closeUploader.bind(this), className: 'ez-uploader__modal-button' },
-                        'Close'
+                        { 'ez-on-click': this.resetModal.bind(this), className: 'ez-uploader__modal-button ez-uploader__modal-button-green' },
+                        'Done'
                     ));
+                } else if (this.uploading) {
 
                     options.push(h(
                         'div',
-                        { 'ez-on-click': this.resetModal.bind(this), className: 'ez-uploader__modal-button ez-uploader__modal-button-blue' },
-                        'Upload more'
-                    ));
-                } else if (this.uploader.isUploading()) {
-
-                    options.push(h(
-                        'div',
-                        { 'ez-on-click': this.pauseUploading.bind(this),
-                            className: 'ez-uploader__modal-button ez-uploader__modal-button-orange' },
+                        { 'ez-on-click': this.pauseUploading.bind(this), className: 'ez-uploader__modal-button ez-uploader__modal-button-orange' },
                         'Pause uploading'
                     ));
                 } else {
@@ -679,7 +876,9 @@ var EzUploader = function (_EzVDOM) {
         value: function getProgressVDOM() {
 
             var progress = this.uploader && this.uploader.progress() * 100 || 0;
-            var style = 'width:' + progress + '%';
+            var background = progress === 100 ? 'background:#27ae60' : '';
+            var width = 'width:' + progress + '%';
+            var style = width + ';' + background;
 
             return h('div', { className: 'ez-uploader__total-progress-inner', style: style });
         }
@@ -703,10 +902,11 @@ var EzUploader = function (_EzVDOM) {
                         ),
                         h(
                             'div',
-                            { 'ez-on-click': this.closeUploader.bind(this), className: 'ez-uploader__modal-cross' },
+                            { 'ez-on-click': this.close.bind(this), className: 'ez-uploader__modal-cross' },
                             h('span', { className: 'ez-uploader__modal-cross-line' }),
                             h('span', { className: 'ez-uploader__modal-cross-line' })
-                        )
+                        ),
+                        this.getErrorVDOM()
                     ),
                     h(
                         'div',
@@ -717,6 +917,7 @@ var EzUploader = function (_EzVDOM) {
                         'div',
                         { 'ez-uploader-drop': true, className: 'ez-uploader__modal-body' },
                         h('div', { 'ez-uploader-browse': true }),
+                        h('div', { 'ez-uploader-browse-directory': true }),
                         this.getBodyVDOM()
                     ),
                     h(
@@ -742,7 +943,8 @@ var EzUploader = function (_EzVDOM) {
 
             var VDOM = this.getVDOM();
             console.time('update dom');
-            console.log('vdom', VDOM);
+            //console.log('-- update vdom', VDOM);
+
             /*
             console.log('---- UPDATE DOM YO -----');
             console.log('old', this.cachedVDOM);
@@ -2041,23 +2243,15 @@ var EzVDOM = function () {
                 key: 'updateEventListenerFromProp',
                 value: function updateEventListenerFromProp($el, event, newMethod, oldMethod) {
 
-                        console.log('updating event listener from prop', $el, event, newMethod, oldMethod);
-
                         if ($el && $el.addEventListener) {
-
-                                console.log('methods', newMethod === oldMethod);
-                                console.log('-', newMethod);
-                                console.log('-', oldMethod);
 
                                 if (oldMethod) {
 
-                                        console.log('removing old method', event, oldMethod);
                                         $el.removeEventListener(event, oldMethod);
                                 }
 
                                 if (newMethod) {
 
-                                        console.log('ADDING NEW METHOD FROM UPDATE', event, newMethod);
                                         this.addEventListenerFromProp($el, event, newMethod);
                                 }
                         }
@@ -2073,8 +2267,6 @@ var EzVDOM = function () {
                         properties.forEach(function (name) {
 
                                 if (_this3.isEventProp(name)) {
-
-                                        console.log('-- ez-on event being updated', $el, name, newProps, oldProps);
 
                                         var event = _this3.extractEventName(name);
 
@@ -2096,8 +2288,6 @@ var EzVDOM = function () {
                                 method = this[method].bind(this);
                         }
 
-                        console.log('adding event listener from prop', $el, name, method);
-
                         $el.addEventListener(event, method);
                 }
         }, {
@@ -2114,10 +2304,6 @@ var EzVDOM = function () {
                                         if (_this4.isEventProp(name)) {
 
                                                 var method = props[name];
-
-                                                if (name == 'ez-on-click') {
-                                                        console.log('ADDING EVENT LISTENER', $el, name, method);
-                                                }
 
                                                 _this4.addEventListenerFromProp($el, name, method);
                                         }
