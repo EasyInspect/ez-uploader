@@ -510,6 +510,20 @@ var EzUploader = function (_EzVDOM) {
             this.updateDOM();
         }
     }, {
+        key: 'retryAllFiles',
+        value: function retryAllFiles() {
+            var _this4 = this;
+
+            var files = Object.keys(this.fileErrors);
+
+            files.forEach(function (fileId) {
+
+                var file = _this4.fileErrors[fileId].file;
+
+                _this4.retryFile(file);
+            });
+        }
+    }, {
         key: 'removeAllFiles',
         value: function removeAllFiles() {
 
@@ -663,7 +677,7 @@ var EzUploader = function (_EzVDOM) {
 
                 options.push(h(
                     'div',
-                    { 'ez-on-click': this.retryFile.bind(this, file), className: 'ez-uploader__modal-button--small ez-uploader__modal-button-wet-asphalt' },
+                    { 'ez-on-click': this.retryFile.bind(this, file), className: 'ez-uploader__modal-button--small ez-uploader__modal-button-blue' },
                     'retry'
                 ));
             }
@@ -794,12 +808,11 @@ var EzUploader = function (_EzVDOM) {
         value: function getUploaderRightOptionsVDOM() {
 
             var options = [];
+            var errorCount = Object.keys(this.fileErrors).length;
 
             if (this.uploader) {
 
                 if (this.uploader.progress() >= 1) {
-
-                    var errorCount = Object.keys(this.fileErrors).length;
 
                     if (!errorCount) {
 
@@ -835,12 +848,30 @@ var EzUploader = function (_EzVDOM) {
                         </div>
                     );*/
 
+                    if (errorCount) {
+
+                        options.push(h(
+                            'div',
+                            { 'ez-on-click': this.retryAllFiles.bind(this), className: 'ez-uploader__modal-button ez-uploader__modal-button-blue' },
+                            'retry failed files'
+                        ));
+                    }
+
                     options.push(h(
                         'div',
                         { 'ez-on-click': this.resetModal.bind(this), className: 'ez-uploader__modal-button ez-uploader__modal-button-green' },
                         'Done'
                     ));
                 } else if (this.uploading) {
+
+                    if (errorCount) {
+
+                        options.push(h(
+                            'div',
+                            { 'ez-on-click': this.retryAllFiles.bind(this), className: 'ez-uploader__modal-button ez-uploader__modal-button-blue' },
+                            'retry failed files'
+                        ));
+                    }
 
                     options.push(h(
                         'div',
@@ -850,6 +881,15 @@ var EzUploader = function (_EzVDOM) {
                 } else {
 
                     if (this.uploader.progress()) {
+
+                        if (errorCount) {
+
+                            options.push(h(
+                                'div',
+                                { 'ez-on-click': this.retryAllFiles.bind(this), className: 'ez-uploader__modal-button ez-uploader__modal-button-blue' },
+                                'retry failed files'
+                            ));
+                        }
 
                         options.push(h(
                             'div',

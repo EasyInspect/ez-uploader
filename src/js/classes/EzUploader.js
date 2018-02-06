@@ -372,6 +372,20 @@ export default class EzUploader extends EzVDOM {
 
     }
 
+    retryAllFiles() {
+
+        const files = Object.keys(this.fileErrors);
+
+        files.forEach(fileId => {
+
+            const file = this.fileErrors[fileId].file;
+
+            this.retryFile(file)
+
+        })
+
+    }
+
     removeAllFiles() {
 
         //console.log('remove all files');
@@ -511,7 +525,7 @@ export default class EzUploader extends EzVDOM {
         } else if (this.fileErrors[file.uniqueIdentifier]) {
 
             options.push(
-                <div ez-on-click={this.retryFile.bind(this, file)} className="ez-uploader__modal-button--small ez-uploader__modal-button-wet-asphalt">
+                <div ez-on-click={this.retryFile.bind(this, file)} className="ez-uploader__modal-button--small ez-uploader__modal-button-blue">
                     retry
                 </div>
             );
@@ -620,12 +634,11 @@ export default class EzUploader extends EzVDOM {
     getUploaderRightOptionsVDOM() {
 
         let options = [];
+        const errorCount = Object.keys(this.fileErrors).length;
 
         if (this.uploader) {
 
             if (this.uploader.progress() >= 1) {
-
-                const errorCount = Object.keys(this.fileErrors).length;
 
                 if (!errorCount) {
 
@@ -653,6 +666,16 @@ export default class EzUploader extends EzVDOM {
                     </div>
                 );*/
 
+                if (errorCount) {
+
+                    options.push(
+                        <div ez-on-click={this.retryAllFiles.bind(this)} className="ez-uploader__modal-button ez-uploader__modal-button-blue">
+                            retry failed files
+                        </div>
+                    );
+
+                }
+
                 options.push(
                     <div ez-on-click={this.resetModal.bind(this)} className="ez-uploader__modal-button ez-uploader__modal-button-green">
                         Done
@@ -660,6 +683,16 @@ export default class EzUploader extends EzVDOM {
                 );
 
             } else if (this.uploading) {
+
+                if (errorCount) {
+
+                    options.push(
+                        <div ez-on-click={this.retryAllFiles.bind(this)} className="ez-uploader__modal-button ez-uploader__modal-button-blue">
+                            retry failed files
+                        </div>
+                    );
+
+                }
 
                 options.push(
                     <div ez-on-click={this.pauseUploading.bind(this)} className="ez-uploader__modal-button ez-uploader__modal-button-orange">
@@ -670,6 +703,16 @@ export default class EzUploader extends EzVDOM {
             } else {
 
                 if (this.uploader.progress()) {
+
+                    if (errorCount) {
+
+                        options.push(
+                            <div ez-on-click={this.retryAllFiles.bind(this)} className="ez-uploader__modal-button ez-uploader__modal-button-blue">
+                                retry failed files
+                            </div>
+                        );
+
+                    }
 
                     options.push(
                         <div ez-on-click={this.startUploading.bind(this)}
