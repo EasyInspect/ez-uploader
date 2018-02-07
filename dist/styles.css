@@ -18,13 +18,24 @@
   font-family: sans-serif; }
 
 .ez-uploader__modal {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-flex: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
   max-width: 900px;
   margin: 50px auto 0 auto;
   background: white;
   -webkit-box-shadow: 0px 0px 3px 1px black;
           box-shadow: 0px 0px 3px 1px black;
-  min-height: 500px;
-  border-radius: 3px; }
+  border-radius: 3px;
+  min-height: 300px;
+  max-height: 600px; }
 
 .ez-uploader__modal-header {
   padding: 15px;
@@ -83,7 +94,16 @@
   border-bottom-right-radius: 3px; }
 
 .ez-uploader__modal-body {
-  height: 500px;
+  -webkit-box-flex: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
   padding: 15px;
   overflow-x: hidden;
   overflow-y: auto; }
@@ -103,7 +123,11 @@
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
           flex-direction: column;
-  border: 1px dashed #ccc; }
+  border: 1px dashed #ccc;
+  padding: 25px;
+  -webkit-box-flex: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1; }
   .ez-uploader__modal-placeholder h2 {
     margin-bottom: 0;
     font-weight: normal; }
@@ -303,6 +327,7 @@
     margin: 0;
     border-radius: 0;
     height: 100%;
+    max-height: 100% !important;
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
@@ -313,7 +338,14 @@
   .ez-uploader__modal-body {
     -webkit-box-flex: 1;
         -ms-flex-positive: 1;
-            flex-grow: 1; }
+            flex-grow: 1;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column; }
   .ez-uploader__modal-footer {
     padding: 15px;
     -webkit-box-orient: vertical;

@@ -9,6 +9,7 @@
       {
         "pragma": "h"
       }
-    ]
+    ],
+    "transform-runtime"
   ]
 }

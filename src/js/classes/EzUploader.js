@@ -136,13 +136,14 @@ export default class EzUploader extends EzVDOM {
 
     }
 
-    browseFiles() {
-
-        //console.log('browse files boi');
+    browseFiles(e) {
 
         const browseButton = document.querySelectorAll("[ez-uploader-browse]")[0];
+        const event = document.createEvent("HTMLEvents");
 
-        browseButton.dispatchEvent(new Event('click'));
+        event.initEvent('click', true, true);
+
+        browseButton.dispatchEvent(event);
 
     }
 
@@ -151,8 +152,11 @@ export default class EzUploader extends EzVDOM {
         //console.log('browse files boi');
 
         const browseButton = document.querySelectorAll("[ez-uploader-browse-directory]")[0];
+        const event = document.createEvent("HTMLEvents");
 
-        browseButton.dispatchEvent(new Event('click'));
+        event.initEvent('click', true, true);
+
+        browseButton.dispatchEvent(event);
 
     }
 
@@ -301,7 +305,7 @@ export default class EzUploader extends EzVDOM {
 
         if (this.modal) {
 
-            this.modal.style.display = 'block';
+            this.modal.style.display = 'flex';
 
         }
 
