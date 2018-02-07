@@ -100,9 +100,7 @@
 }
 
 .ez-uploader__modal-body {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
+  flex: 1;
   padding: 15px;
   overflow-x: hidden;
   overflow-y: auto;
@@ -351,9 +349,7 @@
     flex-direction: column;
   }
   .ez-uploader__modal-body {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
+    flex: 1;
   }
   .ez-uploader__modal-footer {
     padding: 15px;
