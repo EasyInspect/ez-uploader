@@ -291,6 +291,25 @@ export default class EzVDOM {
 
     }
 
+    isInView($parent, $el) {
+
+        return true;
+        if ($el && (!$el.getBoundingClientRect || $el.style.display == 'none')) {
+            return true;
+        }
+
+        const childRect = $el.getBoundingClientRect();
+        const parentRect = $parent.getBoundingClientRect();
+
+        return (
+            childRect.top >= (parentRect.top - childRect.height) &&
+            childRect.bottom <= (parentRect.bottom + childRect.height)
+        );
+
+        return (1<2)
+
+    }
+
     updateElement($parent, newNode, oldNode, $el = $parent.childNodes[0]) {
 
         /*console.log('-- update element');
@@ -319,7 +338,7 @@ export default class EzVDOM {
                 $el
             );
 
-        } else if (newNode.type) {
+        } else if (this.isInView($parent, $el) && newNode.type) {
 
             this.updateProps($el, newNode.props, oldNode.props);
             this.updateEventListenersFromProp($el, newNode.props, oldNode.props);

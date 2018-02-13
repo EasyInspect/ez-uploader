@@ -30,7 +30,7 @@ function h(type, props, ...children) {
 
 export default class EzUploader extends EzVDOM {
 
-    constructor({upload, ui} = {}) {
+    constructor({upload, ui, throttle} = {}) {
 
         super();
 
@@ -45,7 +45,13 @@ export default class EzUploader extends EzVDOM {
             }, upload),
             ui: Object.assign({}, {
                 thumbnail: false
-            }, ui)
+            }, ui),
+            throttle: Object.assign({}, {
+                rate: 1,
+                per: 0.1,
+                lastCheck: Date.now(),
+                allowance: 50
+            }, throttle)
         };
 
         this.uploading = false;
@@ -53,6 +59,13 @@ export default class EzUploader extends EzVDOM {
         this.error = null;
         this.fileErrors = {};
         this.mappedFiles = {};
+        this.stats = {
+            start: 0,
+            iterations: 0,
+            iterationsPerSecond: 0
+        };
+
+        console.log(this.settings.throttle);
 
         this.addUploaderToDOM();
         this.addResumable();
@@ -98,23 +111,21 @@ export default class EzUploader extends EzVDOM {
 
     maxFileSizeErrorCallback(file, errorCount) {
 
-        //console.log(file);
         this.error = `${file.name} is too large, the maximum file size allowed is ${this.convertBytesToMB(this.settings.upload.maxFileSize)}MB`;
+        console.log('update dom from error callback', file);
         this.updateDOM();
 
     }
 
     minFileSizeErrorCallback(file, errorCount) {
 
-        //console.log(file);
         this.error = `${file.name} is too small, the minimum file size allowed is ${this.convertBytesToMB(this.settings.upload.minFileSize)}MB`;
+        console.log('update dom from error callback', file);
         this.updateDOM();
 
     }
 
     fileTypeErrorCallback(file, errorCount) {
-
-        //console.log(file);
 
         const allowedTypes          = this.settings.upload.fileType;
         const allowedTypesString    = allowedTypes.reduce((result, type, index) => {
@@ -132,6 +143,7 @@ export default class EzUploader extends EzVDOM {
         }, '');
 
         this.error = `${file.name} isn't an allowed file type, please upload files of type ${allowedTypesString}`;
+        console.log('update dom from error callback', file);
         this.updateDOM();
 
     }
@@ -187,10 +199,6 @@ export default class EzUploader extends EzVDOM {
         this.uploader.on('error', this.onError.bind(this));
         this.uploader.on('pause', this.onPause.bind(this));
         this.uploader.on('cancel', this.onCancel.bind(this));
-        this.uploader.on('catchAll', () => {
-            /*console.log('update dom from catch all');
-            this.updateDOM()*/
-        });
 
     }
 
@@ -210,7 +218,7 @@ export default class EzUploader extends EzVDOM {
                 fileReader.onload = event => {
 
                     this.mappedFiles[file.uniqueIdentifier].src = event.target.result;
-                    //console.log('update dom from on load');
+                    console.log('update dom from on load');
                     this.updateDOM();
 
                 };
@@ -219,14 +227,14 @@ export default class EzUploader extends EzVDOM {
 
         }
 
-        //console.log('update dom from added');
         this.clearError();
+        console.log('update dom onFilesAdded');
         this.updateDOM();
     }
 
     onFileSuccess(file, event) {
-        //console.log("onFileSuccess", file, event);
         delete this.fileErrors[file.uniqueIdentifier];
+        console.log("update dom from onFileSuccess");
         this.updateDOM();
     }
 
@@ -236,8 +244,8 @@ export default class EzUploader extends EzVDOM {
     }
 
     onFileRetry(file, event) {
-        //console.log("onFileRetry", file, event);
-        this.updateDOM();
+        console.log("update dom from onFileRetry");
+        this.updateDOMWithThrottle();
     }
 
     onFileError(file, error) {
@@ -264,38 +272,39 @@ export default class EzUploader extends EzVDOM {
             error: message
         };
 
+        console.log('update dom from onFileError');
         this.updateDOM();
 
     }
 
     onUploadStart(file, event) {
-        //console.log("onUploadStart", file, event);
+        console.log("update dom from onUploadStart");
         this.updateDOM();
     }
 
     onComplete(file, event) {
-        //console.log("onComplete", file, event);
+        console.log("update dom from onComplete");
         this.uploading = false;
         this.updateDOM();
     }
 
     onProgress(file, event) {
-        //console.log("onProgress", file, event);
-        this.updateDOM();
+        console.log("update dom from onProgress");
+        this.updateDOMWithThrottle();
     }
 
     onError(file, event) {
-        //console.log("onError", file, event);
+        console.log("update dom from onError");
         this.updateDOM();
     }
 
     onPause(file, event) {
-        //console.log("onPause", file, event);
+        console.log("update dom from onPause");
         this.updateDOM();
     }
 
     onCancel(file, event) {
-        //console.log("onCancel", file, event);
+        console.log("update dom from onCancel");
         this.updateDOM();
     }
 
@@ -332,9 +341,11 @@ export default class EzUploader extends EzVDOM {
 
     startUploading() {
 
+        this.stats.start = Date.now();
         this.uploading = true;
         this.clearError();
         this.uploader.upload();
+        console.log('update dom from start uploading');
         this.updateDOM();
 
     }
@@ -346,22 +357,24 @@ export default class EzUploader extends EzVDOM {
 
     }
 
-    removeFile(file) {
+    removeFile(file, updateDom = true) {
 
-        //console.log('remove file', file.fileName);
         delete this.fileErrors[file.uniqueIdentifier];
         this.uploader.removeFile(file);
-        //console.log('files after remove', this.uploader.files);
 
-        //console.log('update dom from remove');
-        this.updateDOM();
+        if (updateDom) {
+
+            console.log('update dom from remove file');
+            this.updateDOM();
+
+        }
 
     }
 
     pauseFile(file) {
 
         file.pause();
-        //console.log('update dom from pause');
+        console.log('update dom from pause file');
         this.updateDOM();
 
     }
@@ -371,7 +384,7 @@ export default class EzUploader extends EzVDOM {
         this.uploading = true;
         delete this.fileErrors[file.uniqueIdentifier];
         file.retry();
-        //console.log('update dom from retry');
+        console.log('update dom from retry');
         this.updateDOM();
 
     }
@@ -392,13 +405,30 @@ export default class EzUploader extends EzVDOM {
 
     removeAllFiles() {
 
-        //console.log('remove all files');
+        console.log('remove all files');
         this.clearError();
         this.clearFileErrors();
-        this.uploader.cancel();
+        //this.uploader.cancel();
         //console.log('files after remove all', this.uploader.files);
 
-        //console.log('update dom from remove all');
+        console.log('all files', this.files);
+
+        const fileIds = this.files.map(file => {
+
+            return file.uniqueIdentifier;
+
+        });
+
+        console.log('file ids', fileIds);
+
+        fileIds.forEach((id, index) => {
+
+            const file = this.uploader.getFromUniqueIdentifier(id);
+            this.removeFile(file, false)
+
+        });
+
+        console.log('update dom from remove all');
         this.updateDOM();
 
     }
@@ -618,14 +648,14 @@ export default class EzUploader extends EzVDOM {
             }
 
             options.push(
-                <div ez-on-click={this.browseFiles.bind(this)} className="ez-uploader__modal-button ez-uploader__modal-button-wet-asphalt">
-                    Add files
+                <div ez-on-click={this.browseDirectory.bind(this)} className="ez-uploader__modal-button ez-uploader__modal-button-wet-asphalt">
+                    Add directory
                 </div>
             );
 
             options.push(
-                <div ez-on-click={this.browseDirectory.bind(this)} className="ez-uploader__modal-button ez-uploader__modal-button-wet-asphalt">
-                    Add directory
+                <div ez-on-click={this.browseFiles.bind(this)} className="ez-uploader__modal-button ez-uploader__modal-button-wet-asphalt">
+                    Add files
                 </div>
             );
 
@@ -663,12 +693,6 @@ export default class EzUploader extends EzVDOM {
                     );
 
                 }
-
-                /*options.push(
-                    <div ez-on-click={this.close.bind(this)} className="ez-uploader__modal-button">
-                        Close
-                    </div>
-                );*/
 
                 if (errorCount) {
 
@@ -719,8 +743,7 @@ export default class EzUploader extends EzVDOM {
                     }
 
                     options.push(
-                        <div ez-on-click={this.startUploading.bind(this)}
-                             className="ez-uploader__modal-button ez-uploader__modal-button-blue">
+                        <div ez-on-click={this.startUploading.bind(this)} className="ez-uploader__modal-button ez-uploader__modal-button-blue">
                             Resume uploading
                         </div>
                     )
@@ -728,8 +751,7 @@ export default class EzUploader extends EzVDOM {
                 } else if(this.files.length) {
 
                     options.push(
-                        <div ez-on-click={this.startUploading.bind(this)}
-                             className="ez-uploader__modal-button ez-uploader__modal-button-blue">
+                        <div ez-on-click={this.startUploading.bind(this)} className="ez-uploader__modal-button ez-uploader__modal-button-blue">
                             Start uploading
                         </div>
                     )
@@ -794,7 +816,47 @@ export default class EzUploader extends EzVDOM {
 
     }
 
+    updateDOMWithThrottle() {
+
+        const current = Date.now();
+        const timePassed = (current - this.settings.throttle.lastCheck) / 1000;
+        const newAllowance = this.settings.throttle.allowance + (timePassed * (this.settings.throttle.rate / this.settings.throttle.per));
+
+        this.settings.throttle.lastCheck = current;
+
+        if (newAllowance >= this.settings.throttle.rate) {
+
+            this.settings.throttle.allowance = this.settings.throttle.rate;
+
+        } else {
+
+            this.settings.throttle.allowance = newAllowance;
+
+        }
+
+        if (this.settings.throttle.allowance >= 1) {
+
+            this.updateDOM();
+            this.settings.throttle.allowance -= 1;
+
+        }
+
+    }
+
     updateDOM() {
+
+        /*this.stats = {
+            start: 0,
+            iterations: 0,
+            iterationsPerSecond: 0
+        };*/
+
+        if (this.stats.start) {
+            this.stats.iterations++;
+            this.stats.iterationsPerSecond = ((Date.now() - this.stats.start) / 1000) / this.stats.iterations;
+        }
+
+        window.stats = this.stats;
 
         const VDOM = this.getVDOM();
         console.time('update dom');
