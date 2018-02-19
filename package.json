@@ -15,10 +15,10 @@
     "url": "https://github.com/EasyInspect/ez-uploader"
   },
   "dependencies": {
-    "babel-runtime": "^6.26.0",
     "resumablejs": "^1.1.0"
   },
   "devDependencies": {
+    "babel-runtime": "^6.26.0",
     "autoprefixer": "^7.2.4",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",

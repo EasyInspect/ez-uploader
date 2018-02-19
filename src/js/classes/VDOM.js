@@ -283,17 +283,16 @@ export default class EzVDOM {
     changed(node1, node2) {
 
         return (
-            typeof node1 !== typeof node2 ||
-            typeof node1 === 'string' || typeof node1 === 'number' && node1 !== node2 ||
-            node1.type !== node2.type ||
-            node1.props && node1.props.forceUpdate
+            (typeof node1 !== typeof node2) ||
+            ((typeof node1 === 'string' || typeof node1 === 'number') && node1 !== node2) ||
+            (node1.type !== node2.type) ||
+            (node1.props && node1.props.forceUpdate && (!node1.props.style || node1.props.style && !node1.props.style.includes('display:none')))
         )
 
     }
 
     isInView($parent, $el) {
 
-        return true;
         if ($el && (!$el.getBoundingClientRect || $el.style.display == 'none')) {
             return true;
         }
@@ -306,13 +305,12 @@ export default class EzVDOM {
             childRect.bottom <= (parentRect.bottom + childRect.height)
         );
 
-        return (1<2)
-
     }
 
     updateElement($parent, newNode, oldNode, $el = $parent.childNodes[0]) {
 
-        /*console.log('-- update element');
+        /*
+        console.log(1, 'update element', newNode);
         console.log($parent);
         console.log(newNode);
         console.log(oldNode);
@@ -338,7 +336,7 @@ export default class EzVDOM {
                 $el
             );
 
-        } else if (this.isInView($parent, $el) && newNode.type) {
+        } else if (newNode.type) {
 
             this.updateProps($el, newNode.props, oldNode.props);
             this.updateEventListenersFromProp($el, newNode.props, oldNode.props);

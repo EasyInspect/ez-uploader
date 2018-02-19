@@ -1016,6 +1016,7 @@ var EzUploader = function (_EzVDOM) {
         _this.addKeypressEventListeners();
 
         window.update = _this.updateDOM.bind(_this);
+        window.updateThrottle = _this.updateDOMWithThrottle.bind(_this);
 
         return _this;
     }
@@ -4212,13 +4213,12 @@ var EzVDOM = function () {
                 key: 'changed',
                 value: function changed(node1, node2) {
 
-                        return (typeof node1 === 'undefined' ? 'undefined' : (0, _typeof3.default)(node1)) !== (typeof node2 === 'undefined' ? 'undefined' : (0, _typeof3.default)(node2)) || typeof node1 === 'string' || typeof node1 === 'number' && node1 !== node2 || node1.type !== node2.type || node1.props && node1.props.forceUpdate;
+                        return (typeof node1 === 'undefined' ? 'undefined' : (0, _typeof3.default)(node1)) !== (typeof node2 === 'undefined' ? 'undefined' : (0, _typeof3.default)(node2)) || (typeof node1 === 'string' || typeof node1 === 'number') && node1 !== node2 || node1.type !== node2.type || node1.props && node1.props.forceUpdate && (!node1.props.style || node1.props.style && !node1.props.style.includes('display:none'));
                 }
         }, {
                 key: 'isInView',
                 value: function isInView($parent, $el) {
 
-                        return true;
                         if ($el && (!$el.getBoundingClientRect || $el.style.display == 'none')) {
                                 return true;
                         }
@@ -4227,8 +4227,6 @@ var EzVDOM = function () {
                         var parentRect = $parent.getBoundingClientRect();
 
                         return childRect.top >= parentRect.top - childRect.height && childRect.bottom <= parentRect.bottom + childRect.height;
-
-                        return 1 < 2;
                 }
         }, {
                 key: 'updateElement',
@@ -4236,7 +4234,8 @@ var EzVDOM = function () {
                         var $el = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : $parent.childNodes[0];
 
 
-                        /*console.log('-- update element');
+                        /*
+                        console.log(1, 'update element', newNode);
                         console.log($parent);
                         console.log(newNode);
                         console.log(oldNode);
@@ -4254,7 +4253,7 @@ var EzVDOM = function () {
                         } else if (this.changed(newNode, oldNode)) {
 
                                 $parent.replaceChild(this.createElement(newNode), $el);
-                        } else if (this.isInView($parent, $el) && newNode.type) {
+                        } else if (newNode.type) {
 
                                 this.updateProps($el, newNode.props, oldNode.props);
                                 this.updateEventListenersFromProp($el, newNode.props, oldNode.props);

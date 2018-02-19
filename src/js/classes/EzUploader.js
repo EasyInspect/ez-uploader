@@ -72,6 +72,7 @@ export default class EzUploader extends EzVDOM {
         this.addKeypressEventListeners();
 
         window.update = this.updateDOM.bind(this);
+        window.updateThrottle = this.updateDOMWithThrottle.bind(this);
 
     }
 
