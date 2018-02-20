@@ -1,6 +1,6 @@
 {
   "name": "@easyinspect/ez-uploader",
-  "version": "1.1.9",
+  "version": "1.1.10",
   "description": "File uploader",
   "main": "dist/index.js",
   "author": "EasyInspect ApS",
