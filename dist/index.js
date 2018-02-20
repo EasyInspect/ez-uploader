@@ -994,7 +994,8 @@ var EzUploader = function (_EzVDOM) {
                 rate: 1,
                 per: 0.1,
                 lastCheck: Date.now(),
-                allowance: 50
+                allowance: 50,
+                debug: false
             }, throttle)
         };
 
@@ -1008,8 +1009,6 @@ var EzUploader = function (_EzVDOM) {
             iterations: 0,
             iterationsPerSecond: 0
         };
-
-        console.log(_this.settings.throttle);
 
         _this.addUploaderToDOM();
         _this.addResumable();
@@ -1054,7 +1053,7 @@ var EzUploader = function (_EzVDOM) {
         value: function maxFileSizeErrorCallback(file, errorCount) {
 
             this.error = file.name + ' is too large, the maximum file size allowed is ' + this.convertBytesToMB(this.settings.upload.maxFileSize) + 'MB';
-            console.log('update dom from error callback', file);
+            //console.log('update dom from error callback', file);
             this.updateDOM();
         }
     }, {
@@ -1062,7 +1061,7 @@ var EzUploader = function (_EzVDOM) {
         value: function minFileSizeErrorCallback(file, errorCount) {
 
             this.error = file.name + ' is too small, the minimum file size allowed is ' + this.convertBytesToMB(this.settings.upload.minFileSize) + 'MB';
-            console.log('update dom from error callback', file);
+            //console.log('update dom from error callback', file);
             this.updateDOM();
         }
     }, {
@@ -1084,7 +1083,7 @@ var EzUploader = function (_EzVDOM) {
             }, '');
 
             this.error = file.name + ' isn\'t an allowed file type, please upload files of type ' + allowedTypesString;
-            console.log('update dom from error callback', file);
+            //console.log('update dom from error callback', file);
             this.updateDOM();
         }
     }, {
@@ -1159,21 +1158,21 @@ var EzUploader = function (_EzVDOM) {
                     fileReader.onload = function (event) {
 
                         _this3.mappedFiles[file.uniqueIdentifier].src = event.target.result;
-                        console.log('update dom from on load');
+                        //console.log('update dom from on load');
                         _this3.updateDOM();
                     };
                 });
             }
 
             this.clearError();
-            console.log('update dom onFilesAdded');
+            //console.log('update dom onFilesAdded');
             this.updateDOM();
         }
     }, {
         key: 'onFileSuccess',
         value: function onFileSuccess(file, event) {
             delete this.fileErrors[file.uniqueIdentifier];
-            console.log("update dom from onFileSuccess");
+            //console.log("update dom from onFileSuccess");
             this.updateDOM();
         }
     }, {
@@ -1185,7 +1184,7 @@ var EzUploader = function (_EzVDOM) {
     }, {
         key: 'onFileRetry',
         value: function onFileRetry(file, event) {
-            console.log("update dom from onFileRetry");
+            //console.log("update dom from onFileRetry");
             this.updateDOMWithThrottle();
         }
     }, {
@@ -1212,44 +1211,44 @@ var EzUploader = function (_EzVDOM) {
                 error: message
             };
 
-            console.log('update dom from onFileError');
+            //console.log('update dom from onFileError');
             this.updateDOM();
         }
     }, {
         key: 'onUploadStart',
         value: function onUploadStart(file, event) {
-            console.log("update dom from onUploadStart");
+            //console.log("update dom from onUploadStart");
             this.updateDOM();
         }
     }, {
         key: 'onComplete',
         value: function onComplete(file, event) {
-            console.log("update dom from onComplete");
+            //console.log("update dom from onComplete");
             this.uploading = false;
             this.updateDOM();
         }
     }, {
         key: 'onProgress',
         value: function onProgress(file, event) {
-            console.log("update dom from onProgress");
+            //console.log("update dom from onProgress");
             this.updateDOMWithThrottle();
         }
     }, {
         key: 'onError',
         value: function onError(file, event) {
-            console.log("update dom from onError");
+            //console.log("update dom from onError");
             this.updateDOM();
         }
     }, {
         key: 'onPause',
         value: function onPause(file, event) {
-            console.log("update dom from onPause");
+            //console.log("update dom from onPause");
             this.updateDOM();
         }
     }, {
         key: 'onCancel',
         value: function onCancel(file, event) {
-            console.log("update dom from onCancel");
+            //console.log("update dom from onCancel");
             this.updateDOM();
         }
     }, {
@@ -1289,7 +1288,7 @@ var EzUploader = function (_EzVDOM) {
             this.uploading = true;
             this.clearError();
             this.uploader.upload();
-            console.log('update dom from start uploading');
+            //console.log('update dom from start uploading');
             this.updateDOM();
         }
     }, {
@@ -1310,7 +1309,7 @@ var EzUploader = function (_EzVDOM) {
 
             if (updateDom) {
 
-                console.log('update dom from remove file');
+                //console.log('update dom from remove file');
                 this.updateDOM();
             }
         }
@@ -1319,7 +1318,7 @@ var EzUploader = function (_EzVDOM) {
         value: function pauseFile(file) {
 
             file.pause();
-            console.log('update dom from pause file');
+            //console.log('update dom from pause file');
             this.updateDOM();
         }
     }, {
@@ -1329,7 +1328,7 @@ var EzUploader = function (_EzVDOM) {
             this.uploading = true;
             delete this.fileErrors[file.uniqueIdentifier];
             file.retry();
-            console.log('update dom from retry');
+            //console.log('update dom from retry');
             this.updateDOM();
         }
     }, {
@@ -1351,20 +1350,20 @@ var EzUploader = function (_EzVDOM) {
         value: function removeAllFiles() {
             var _this5 = this;
 
-            console.log('remove all files');
+            //console.log('remove all files');
             this.clearError();
             this.clearFileErrors();
             //this.uploader.cancel();
             //console.log('files after remove all', this.uploader.files);
 
-            console.log('all files', this.files);
+            //console.log('all files', this.files);
 
             var fileIds = this.files.map(function (file) {
 
                 return file.uniqueIdentifier;
             });
 
-            console.log('file ids', fileIds);
+            //console.log('file ids', fileIds);
 
             fileIds.forEach(function (id, index) {
 
@@ -1372,7 +1371,7 @@ var EzUploader = function (_EzVDOM) {
                 _this5.removeFile(file, false);
             });
 
-            console.log('update dom from remove all');
+            //console.log('update dom from remove all');
             this.updateDOM();
         }
     }, {
@@ -1842,15 +1841,19 @@ var EzUploader = function (_EzVDOM) {
                 iterationsPerSecond: 0
             };*/
 
-            if (this.stats.start) {
-                this.stats.iterations++;
-                this.stats.iterationsPerSecond = (Date.now() - this.stats.start) / 1000 / this.stats.iterations;
+            if (this.settings.throttle.debug) {
+
+                if (this.stats.start) {
+                    this.stats.iterations++;
+                    this.stats.iterationsPerSecond = (Date.now() - this.stats.start) / 1000 / this.stats.iterations;
+                }
+
+                window.stats = this.stats;
             }
 
-            window.stats = this.stats;
+            this.settings.throttle.debug && console.time('update dom');
 
             var VDOM = this.getVDOM();
-            console.time('update dom');
             //console.log('-- update vdom', VDOM);
 
             /*
@@ -1862,7 +1865,8 @@ var EzUploader = function (_EzVDOM) {
             this.updateElement(this.modal, VDOM.children[0], this.cachedVDOM.children[0]);
             this.cachedVDOM = VDOM;
 
-            console.timeEnd('update dom');
+            this.settings.throttle.debug && console.timeEnd('update dom');
+
             /*
             console.log('// DONE UPDATING DOM //', this.cachedVDOM);
             */
@@ -3979,15 +3983,18 @@ var EzVDOM = function () {
                         if (this.isCustomProp(name)) {
 
                                 return;
-                        } else if (name === 'className') {
+                        } else if ($el.setAttribute) {
 
-                                $el.setAttribute('class', value);
-                        } else if (typeof value === 'boolean') {
+                                if (name === 'className') {
 
-                                this.setBooleanProp($el, name, value);
-                        } else {
+                                        $el.setAttribute('class', value);
+                                } else if (typeof value === 'boolean') {
 
-                                $el.setAttribute(name, value);
+                                        this.setBooleanProp($el, name, value);
+                                } else {
+
+                                        $el.setAttribute(name, value);
+                                }
                         }
                 }
         }, {
@@ -4014,15 +4021,18 @@ var EzVDOM = function () {
                 key: 'removeProp',
                 value: function removeProp($el, name, value) {
 
-                        if (name === 'className') {
+                        if ($el.removeAttribute) {
 
-                                $el.removeAttribute('class');
-                        } else if (typeof value === 'boolean') {
+                                if (name === 'className') {
 
-                                this.removeBooleanProp($el, name);
-                        } else {
+                                        $el.removeAttribute('class');
+                                } else if (typeof value === 'boolean') {
 
-                                $el.removeAttribute(name);
+                                        this.removeBooleanProp($el, name);
+                                } else {
+
+                                        $el.removeAttribute(name);
+                                }
                         }
                 }
         }, {
@@ -4049,18 +4059,18 @@ var EzVDOM = function () {
                         var oldProps = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
 
-                        if ($el && $el.setAttribute) {
+                        var props = (0, _assign2.default)({}, newProps, oldProps);
 
-                                var props = (0, _assign2.default)({}, newProps, oldProps);
+                        (0, _keys2.default)(props).forEach(function (name) {
 
-                                (0, _keys2.default)(props).forEach(function (name) {
+                                var newProp = newProps && !_this2.isNil(newProps[name]) && newProps[name] || null;
+                                var oldProp = oldProps && !_this2.isNil(oldProps[name]) && oldProps[name] || null;
 
-                                        var newProp = newProps && !_this2.isNil(newProps[name]) && newProps[name] || null;
-                                        var oldProp = oldProps && !_this2.isNil(oldProps[name]) && oldProps[name] || null;
+                                if (newProp != oldProp) {
 
                                         _this2.updateProp($el, name, newProp, oldProp);
-                                });
-                        }
+                                }
+                        });
                 }
         }, {
                 key: 'isConditionalProp',
@@ -4240,7 +4250,8 @@ var EzVDOM = function () {
                         console.log(newNode);
                         console.log(oldNode);
                         console.log($el);
-                        console.log('//--');*/
+                        console.log('//--');
+                        */
 
                         if (this.isNil(oldNode)) {
 

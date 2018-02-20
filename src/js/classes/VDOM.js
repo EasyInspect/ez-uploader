@@ -32,17 +32,21 @@ export default class EzVDOM {
 
             return;
 
-        } else if (name === 'className') {
+        } else if ($el.setAttribute) {
 
-            $el.setAttribute('class', value);
+            if (name === 'className') {
 
-        } else if (typeof value === 'boolean') {
+                $el.setAttribute('class', value);
 
-            this.setBooleanProp($el, name, value);
+            } else if (typeof value === 'boolean') {
 
-        } else {
+                this.setBooleanProp($el, name, value);
 
-            $el.setAttribute(name, value);
+            } else {
+
+                $el.setAttribute(name, value);
+
+            }
 
         }
 
@@ -72,17 +76,21 @@ export default class EzVDOM {
 
     removeProp($el, name, value) {
 
-        if (name === 'className') {
+        if ($el.removeAttribute) {
 
-            $el.removeAttribute('class');
+            if (name === 'className') {
 
-        } else if (typeof value === 'boolean') {
+                $el.removeAttribute('class');
 
-            this.removeBooleanProp($el, name);
+            } else if (typeof value === 'boolean') {
 
-        } else {
+                this.removeBooleanProp($el, name);
 
-            $el.removeAttribute(name);
+            } else {
+
+                $el.removeAttribute(name);
+
+            }
 
         }
 
@@ -108,20 +116,20 @@ export default class EzVDOM {
 
     updateProps($el, newProps = {}, oldProps = {}) {
 
-        if ($el && $el.setAttribute) {
+        const props = Object.assign({}, newProps, oldProps);
 
-            const props = Object.assign({}, newProps, oldProps);
+        Object.keys(props).forEach(name => {
 
-            Object.keys(props).forEach(name => {
+            const newProp = newProps && !this.isNil(newProps[name]) && newProps[name] || null;
+            const oldProp = oldProps && !this.isNil(oldProps[name]) && oldProps[name] || null;
 
-                const newProp = newProps && !this.isNil(newProps[name]) && newProps[name] || null;
-                const oldProp = oldProps && !this.isNil(oldProps[name]) && oldProps[name] || null;
+            if (newProp != oldProp) {
 
                 this.updateProp($el, name, newProp, oldProp);
 
-            });
+            }
 
-        }
+        });
 
     }
 
@@ -315,7 +323,8 @@ export default class EzVDOM {
         console.log(newNode);
         console.log(oldNode);
         console.log($el);
-        console.log('//--');*/
+        console.log('//--');
+        */
 
         if (this.isNil(oldNode)) {
 
@@ -337,6 +346,7 @@ export default class EzVDOM {
             );
 
         } else if (newNode.type) {
+
 
             this.updateProps($el, newNode.props, oldNode.props);
             this.updateEventListenersFromProp($el, newNode.props, oldNode.props);

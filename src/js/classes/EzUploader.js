@@ -50,7 +50,8 @@ export default class EzUploader extends EzVDOM {
                 rate: 1,
                 per: 0.1,
                 lastCheck: Date.now(),
-                allowance: 50
+                allowance: 50,
+                debug: false
             }, throttle)
         };
 
@@ -64,8 +65,6 @@ export default class EzUploader extends EzVDOM {
             iterations: 0,
             iterationsPerSecond: 0
         };
-
-        console.log(this.settings.throttle);
 
         this.addUploaderToDOM();
         this.addResumable();
@@ -113,7 +112,7 @@ export default class EzUploader extends EzVDOM {
     maxFileSizeErrorCallback(file, errorCount) {
 
         this.error = `${file.name} is too large, the maximum file size allowed is ${this.convertBytesToMB(this.settings.upload.maxFileSize)}MB`;
-        console.log('update dom from error callback', file);
+        //console.log('update dom from error callback', file);
         this.updateDOM();
 
     }
@@ -121,7 +120,7 @@ export default class EzUploader extends EzVDOM {
     minFileSizeErrorCallback(file, errorCount) {
 
         this.error = `${file.name} is too small, the minimum file size allowed is ${this.convertBytesToMB(this.settings.upload.minFileSize)}MB`;
-        console.log('update dom from error callback', file);
+        //console.log('update dom from error callback', file);
         this.updateDOM();
 
     }
@@ -144,7 +143,7 @@ export default class EzUploader extends EzVDOM {
         }, '');
 
         this.error = `${file.name} isn't an allowed file type, please upload files of type ${allowedTypesString}`;
-        console.log('update dom from error callback', file);
+        //console.log('update dom from error callback', file);
         this.updateDOM();
 
     }
@@ -219,7 +218,7 @@ export default class EzUploader extends EzVDOM {
                 fileReader.onload = event => {
 
                     this.mappedFiles[file.uniqueIdentifier].src = event.target.result;
-                    console.log('update dom from on load');
+                    //console.log('update dom from on load');
                     this.updateDOM();
 
                 };
@@ -229,13 +228,13 @@ export default class EzUploader extends EzVDOM {
         }
 
         this.clearError();
-        console.log('update dom onFilesAdded');
+        //console.log('update dom onFilesAdded');
         this.updateDOM();
     }
 
     onFileSuccess(file, event) {
         delete this.fileErrors[file.uniqueIdentifier];
-        console.log("update dom from onFileSuccess");
+        //console.log("update dom from onFileSuccess");
         this.updateDOM();
     }
 
@@ -245,7 +244,7 @@ export default class EzUploader extends EzVDOM {
     }
 
     onFileRetry(file, event) {
-        console.log("update dom from onFileRetry");
+        //console.log("update dom from onFileRetry");
         this.updateDOMWithThrottle();
     }
 
@@ -273,39 +272,39 @@ export default class EzUploader extends EzVDOM {
             error: message
         };
 
-        console.log('update dom from onFileError');
+        //console.log('update dom from onFileError');
         this.updateDOM();
 
     }
 
     onUploadStart(file, event) {
-        console.log("update dom from onUploadStart");
+        //console.log("update dom from onUploadStart");
         this.updateDOM();
     }
 
     onComplete(file, event) {
-        console.log("update dom from onComplete");
+        //console.log("update dom from onComplete");
         this.uploading = false;
         this.updateDOM();
     }
 
     onProgress(file, event) {
-        console.log("update dom from onProgress");
+        //console.log("update dom from onProgress");
         this.updateDOMWithThrottle();
     }
 
     onError(file, event) {
-        console.log("update dom from onError");
+        //console.log("update dom from onError");
         this.updateDOM();
     }
 
     onPause(file, event) {
-        console.log("update dom from onPause");
+        //console.log("update dom from onPause");
         this.updateDOM();
     }
 
     onCancel(file, event) {
-        console.log("update dom from onCancel");
+        //console.log("update dom from onCancel");
         this.updateDOM();
     }
 
@@ -346,7 +345,7 @@ export default class EzUploader extends EzVDOM {
         this.uploading = true;
         this.clearError();
         this.uploader.upload();
-        console.log('update dom from start uploading');
+        //console.log('update dom from start uploading');
         this.updateDOM();
 
     }
@@ -365,7 +364,7 @@ export default class EzUploader extends EzVDOM {
 
         if (updateDom) {
 
-            console.log('update dom from remove file');
+            //console.log('update dom from remove file');
             this.updateDOM();
 
         }
@@ -375,7 +374,7 @@ export default class EzUploader extends EzVDOM {
     pauseFile(file) {
 
         file.pause();
-        console.log('update dom from pause file');
+        //console.log('update dom from pause file');
         this.updateDOM();
 
     }
@@ -385,7 +384,7 @@ export default class EzUploader extends EzVDOM {
         this.uploading = true;
         delete this.fileErrors[file.uniqueIdentifier];
         file.retry();
-        console.log('update dom from retry');
+        //console.log('update dom from retry');
         this.updateDOM();
 
     }
@@ -406,13 +405,13 @@ export default class EzUploader extends EzVDOM {
 
     removeAllFiles() {
 
-        console.log('remove all files');
+        //console.log('remove all files');
         this.clearError();
         this.clearFileErrors();
         //this.uploader.cancel();
         //console.log('files after remove all', this.uploader.files);
 
-        console.log('all files', this.files);
+        //console.log('all files', this.files);
 
         const fileIds = this.files.map(file => {
 
@@ -420,7 +419,7 @@ export default class EzUploader extends EzVDOM {
 
         });
 
-        console.log('file ids', fileIds);
+        //console.log('file ids', fileIds);
 
         fileIds.forEach((id, index) => {
 
@@ -429,7 +428,7 @@ export default class EzUploader extends EzVDOM {
 
         });
 
-        console.log('update dom from remove all');
+        //console.log('update dom from remove all');
         this.updateDOM();
 
     }
@@ -852,15 +851,20 @@ export default class EzUploader extends EzVDOM {
             iterationsPerSecond: 0
         };*/
 
-        if (this.stats.start) {
-            this.stats.iterations++;
-            this.stats.iterationsPerSecond = ((Date.now() - this.stats.start) / 1000) / this.stats.iterations;
+        if (this.settings.throttle.debug) {
+
+            if (this.stats.start) {
+                this.stats.iterations++;
+                this.stats.iterationsPerSecond = ((Date.now() - this.stats.start) / 1000) / this.stats.iterations;
+            }
+
+            window.stats = this.stats;
+
         }
 
-        window.stats = this.stats;
+        this.settings.throttle.debug && console.time('update dom');
 
         const VDOM = this.getVDOM();
-        console.time('update dom');
         //console.log('-- update vdom', VDOM);
 
         /*
@@ -872,7 +876,8 @@ export default class EzUploader extends EzVDOM {
         this.updateElement(this.modal, VDOM.children[0], this.cachedVDOM.children[0]);
         this.cachedVDOM = VDOM;
 
-        console.timeEnd('update dom');
+        this.settings.throttle.debug && console.timeEnd('update dom');
+
         /*
         console.log('// DONE UPDATING DOM //', this.cachedVDOM);
         */
