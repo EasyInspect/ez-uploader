@@ -70,8 +70,10 @@ export default class EzUploader extends EzVDOM {
         this.addResumable();
         this.addKeypressEventListeners();
 
-        window.update = this.updateDOM.bind(this);
-        window.updateThrottle = this.updateDOMWithThrottle.bind(this);
+        if (this.settings.throttle.debug) {
+            window.update = this.updateDOM.bind(this);
+            window.updateThrottle = this.updateDOMWithThrottle.bind(this);
+        }
 
     }
 
@@ -433,11 +435,28 @@ export default class EzUploader extends EzVDOM {
 
     }
 
+    getUploadedBytes() {
+
+        const progress      = this.uploader.progress() * 100;
+        const progressInMb  = (this.getTotalBytes() / 100) * progress;
+
+        return parseFloat(progressInMb.toFixed(2))
+
+    }
+
+    getTotalBytes() {
+
+        const mb = this.files.reduce((sum, file) => sum += this.convertBytesToMB(file.size), 0);
+
+        return parseFloat(mb.toFixed(2))
+
+    }
+
     convertBytesToMB(bytes) {
 
         const mb = !isNaN(bytes) ? bytes / 1024 / 1024 : 0;
 
-        return parseFloat(mb).toFixed(2)
+        return parseFloat(mb.toFixed(2))
 
     }
 
@@ -470,7 +489,13 @@ export default class EzUploader extends EzVDOM {
             const progress = (this.uploader.progress() * 100).toFixed(2);
 
             return (
-                <p>Uploading {this.files.length} {this.files.length > 1 ? 'files' : 'file'} <span className="ez-uploader__progress-text">({progress}%)</span></p>
+                <p>
+                    Uploading {this.files.length} {this.files.length > 1 ? 'files' : 'file'}
+                    &nbsp;
+                    <span className="ez-uploader__progress-text">{this.getUploadedBytes()} MB / {this.getTotalBytes()} MB</span>
+                    &nbsp;
+                    <span className="ez-uploader__progress-text">({progress}%)</span>
+                </p>
             )
 
         } else if (this.uploader.progress() >= 1) {
@@ -482,7 +507,9 @@ export default class EzUploader extends EzVDOM {
         } else {
 
             return (
-                <p>You've chosen {this.files.length} {this.files.length > 1 ? 'files' : 'file'}</p>
+                <p>
+                    You've chosen {this.files.length} {this.files.length > 1 ? 'files' : 'file'} <span className="ez-uploader__progress-text">{this.getTotalBytes()} MB</span>
+                </p>
             )
 
         }
