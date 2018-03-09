@@ -38,8 +38,9 @@ export default class EzUploader extends EzVDOM {
             upload: Object.assign({}, {
                 target: null,
                 headers: {},
-                minFileSizeErrorCallback: this.minFileSizeErrorCallback.bind(this),
+                maxFilesErrorCallback: this.maxFilesErrorCallback.bind(this),
                 maxFileSizeErrorCallback: this.maxFileSizeErrorCallback.bind(this),
+                minFileSizeErrorCallback: this.minFileSizeErrorCallback.bind(this),
                 fileType: [],
                 fileTypeErrorCallback: this.fileTypeErrorCallback.bind(this)
             }, upload),
@@ -108,6 +109,14 @@ export default class EzUploader extends EzVDOM {
     clearFileErrors() {
 
         this.fileErrors = {};
+
+    }
+
+    maxFilesErrorCallback(files, errorCount) {
+
+        this.error = `You can only upload ${this.settings.upload.maxFiles} ${this.settings.upload.maxFiles > 1 ? 'images' : 'image'}`;
+        //console.log('update dom from error callback', files, errorCount);
+        this.updateDOM();
 
     }
 
@@ -361,6 +370,7 @@ export default class EzUploader extends EzVDOM {
 
     removeFile(file, updateDom = true) {
 
+        this.clearError();
         delete this.fileErrors[file.uniqueIdentifier];
         this.uploader.removeFile(file);
 
