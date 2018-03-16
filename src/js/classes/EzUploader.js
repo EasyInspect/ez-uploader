@@ -499,6 +499,11 @@ export default class EzUploader extends EzVDOM {
             const progress = (this.uploader.progress() * 100).toFixed(2);
 
             return (
+                <p></p>
+            );
+
+            /*
+            return (
                 <p>
                     Uploading {this.files.length} {this.files.length > 1 ? 'files' : 'file'}
                     &nbsp;
@@ -507,6 +512,7 @@ export default class EzUploader extends EzVDOM {
                     <span className="ez-uploader__progress-text">({progress}%)</span>
                 </p>
             )
+            */
 
         } else if (this.uploader.progress() >= 1) {
 
@@ -574,18 +580,44 @@ export default class EzUploader extends EzVDOM {
 
         let options = [];
 
-        if (this.uploader && !this.fileErrors[file.uniqueIdentifier] && (this.uploading || file.progress())) {
+        if (this.uploader && !this.fileErrors[file.uniqueIdentifier] && (this.uploading || file.progress() === 1)) {
 
-            const progress  = file.progress() * 100;
-            const style     = `width:${progress}%`;
+            if (this.files.length >= 500 && 1<1) {
 
-            options.push(
-                <div className="ez-uploader__modal-file-progress">
-                    <div className="ez-uploader__modal-file-progress-inner" style={style}></div>
-                </div>
-            )
+                if (file.progress() === 1) {
 
-        } else if (!this.uploading && file.progress() === 0) {
+                    options.push(
+                        <div className="ez-uploader__modal-badge ez-uploader__modal-badge-green">
+                            uploaded
+                        </div>
+                    )
+
+                } else if (file.progress()) {
+
+                    options.push(
+                        <div className="ez-uploader__modal-badge ez-uploader__modal-badge-blue">
+                            uploading...
+                        </div>
+                    )
+
+                }
+
+            } else {
+
+                const progress  = file.progress() * 100;
+                const style     = `width:${progress}%`;
+
+                options.push(
+                    <div className="ez-uploader__modal-file-progress">
+                        <div className="ez-uploader__modal-file-progress-inner" style={style}></div>
+                    </div>
+                )
+
+            }
+
+
+
+        } else if (!this.uploading && file.progress() !== 1) {
 
             options.push(
                 <div ez-on-click={this.removeFile.bind(this, file)} className="ez-uploader__modal-button--small ez-uploader__modal-button-red">
@@ -611,22 +643,67 @@ export default class EzUploader extends EzVDOM {
 
         let options = [];
 
-        if (this.uploader && this.uploader.files.length) {
+        if (this.uploading) {
 
-            options = this.files.map(this.getFileVDOM.bind(this))
+            const errorCount = Object.keys(this.fileErrors).length;
+            const progress  = (this.uploader.progress() * 100).toFixed(2);
+            const buttons   = [];
+
+            if (errorCount) {
+
+                buttons.push(
+                    <div ez-on-click={this.retryAllFiles.bind(this)} className="ez-uploader__modal-button ez-uploader__modal-button-blue">
+                        retry failed files
+                    </div>
+                );
+
+            }
+
+            buttons.push(
+                <div ez-on-click={this.pauseUploading.bind(this)} className="ez-uploader__modal-button ez-uploader__modal-button-orange">
+                    Pause uploading
+                </div>
+            );
+
+            options.push(
+                <div className="ez-uploader__modal-placeholder" style="border: none">
+                    <h2>Uploading {this.files.length} {this.files.length > 1 ? 'files' : 'file'}</h2>
+                    <p style="opacity: 0.8;">
+                        <span>{this.getUploadedBytes()} MB / {this.getTotalBytes()} MB</span>
+                        &nbsp;
+                        <span>({progress}%)</span>
+                    </p>
+                    {!!errorCount && (
+                        <p className="ez-uploader__modal-file--error" style="margin-top:0">
+                            {errorCount} {errorCount > 1 ? 'files' : 'file'} failed
+                        </p>
+                    )}
+                    <div>
+                        {buttons}
+                    </div>
+                </div>
+            )
+
+        } else {
+
+            if (this.uploader && this.uploader.files.length) {
+
+                options = options.concat(this.files.map(this.getFileVDOM.bind(this)));
+
+            }
+
+            options.push(
+                <div forceUpdate ez-show-flex={!this.files.length} className="ez-uploader__modal-placeholder">
+                    <h2>Drag and drop files</h2>
+                    <p>or</p>
+                    <div>
+                        <div ez-on-click={this.browseDirectory.bind(this)} className="ez-uploader__modal-button ez-uploader__modal-button-wet-asphalt" style="margin-right:5px">Add directory</div>
+                        <div ez-on-click={this.browseFiles.bind(this)} className="ez-uploader__modal-button ez-uploader__modal-button-wet-asphalt">Add files</div>
+                    </div>
+                </div>
+            );
 
         }
-
-        options.push(
-            <div forceUpdate ez-show-flex={!this.files.length} className="ez-uploader__modal-placeholder">
-                <h2>Drag and drop files</h2>
-                <p>or</p>
-                <div>
-                    <div ez-on-click={this.browseDirectory.bind(this)} className="ez-uploader__modal-button ez-uploader__modal-button-wet-asphalt" style="margin-right:5px">Add directory</div>
-                    <div ez-on-click={this.browseFiles.bind(this)} className="ez-uploader__modal-button ez-uploader__modal-button-wet-asphalt">Add files</div>
-                </div>
-            </div>
-        );
 
         return options;
 
@@ -822,7 +899,7 @@ export default class EzUploader extends EzVDOM {
             <div className="ez-uploader__backdrop">
                 <div className="ez-uploader__modal">
                     <div className="ez-uploader__modal-header">
-                        <div className="ez-uploader__modal-title">
+                        <div ez-display-block={!this.uploading} className="ez-uploader__modal-title">
                             {this.getTitleVDOM()}
                         </div>
                         <div ez-on-click={this.close.bind(this)} className="ez-uploader__modal-cross">
@@ -839,7 +916,7 @@ export default class EzUploader extends EzVDOM {
                         <div ez-uploader-browse-directory></div>
                         {this.getBodyVDOM()}
                     </div>
-                    <div ez-show-flex={this.files.length} className="ez-uploader__modal-footer">
+                    <div ez-show-flex={this.files.length && !this.uploading} className="ez-uploader__modal-footer">
                         <div className="ez-uploader__modal-footer-left">
                             {this.getUploaderLeftOptionsVDOM()}
                         </div>
@@ -855,9 +932,19 @@ export default class EzUploader extends EzVDOM {
 
     updateDOMWithThrottle() {
 
-        const current = Date.now();
-        const timePassed = (current - this.settings.throttle.lastCheck) / 1000;
-        const newAllowance = this.settings.throttle.allowance + (timePassed * (this.settings.throttle.rate / this.settings.throttle.per));
+
+        const filesCount    = this.files.length;
+        const rate          = filesCount / 1000;
+
+        this.settings.throttle.per = rate > 1
+            ? 1
+            : rate < 0.1
+                ? 0.1
+                : rate;
+
+        const current       = Date.now();
+        const timePassed    = (current - this.settings.throttle.lastCheck) / 1000;
+        const newAllowance  = this.settings.throttle.allowance + (timePassed * (this.settings.throttle.rate / this.settings.throttle.per));
 
         this.settings.throttle.lastCheck = current;
 

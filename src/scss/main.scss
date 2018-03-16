@@ -123,6 +123,11 @@
 
 }
 
+.ez-uploader__modal-pagination-button {
+  margin: 10px 0;
+  width: 100%;
+}
+
 .ez-uploader__modal-file {
   //padding-bottom: 10px;
   //margin-bottom: 10px;
@@ -241,9 +246,25 @@
   text-align: center;
 }
 
+.ez-uploader__modal-badge {
+  padding: 5px 10px;
+  color: white;
+  background: darkgrey;
+  border-radius: 15px;
+  display: inline-block;
+  text-align: center;
+}
+
 .ez-uploader__modal-button--small {
   @extend .ez-uploader__modal-button;
   padding: 5px 10px;
+}
+
+.ez-uploader__modal-badge-blue {
+  background: #2980b9;
+}
+.ez-uploader__modal-badge-green {
+  background: #27ae60;
 }
 
 .ez-uploader__modal-button:hover {
