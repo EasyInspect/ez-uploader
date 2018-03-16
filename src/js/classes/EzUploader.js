@@ -91,6 +91,8 @@ export default class EzUploader extends EzVDOM {
         const directory = document.querySelectorAll("[ez-uploader-browse-directory]");
         const drop = document.querySelectorAll("[ez-uploader-drop]")[0];
 
+        this.addInputEventListeners();
+
         this.uploader = new Resumable(settings);
 
         this.uploader.assignBrowse(file);
@@ -162,11 +164,15 @@ export default class EzUploader extends EzVDOM {
     browseFiles(e) {
 
         const browseButton = document.querySelectorAll("[ez-uploader-browse]")[0];
+
+        browseButton.click();
+        /*
         const event = document.createEvent("HTMLEvents");
 
         event.initEvent('click', true, true);
 
         browseButton.dispatchEvent(event);
+        */
 
     }
 
@@ -175,11 +181,15 @@ export default class EzUploader extends EzVDOM {
         //console.log('browse files boi');
 
         const browseButton = document.querySelectorAll("[ez-uploader-browse-directory]")[0];
+
+        browseButton.click();
+        /*
         const event = document.createEvent("HTMLEvents");
 
         event.initEvent('click', true, true);
 
         browseButton.dispatchEvent(event);
+        */
 
     }
 
@@ -193,6 +203,20 @@ export default class EzUploader extends EzVDOM {
 
             }
 
+        })
+
+    }
+
+    addInputEventListeners() {
+
+        const file = document.querySelectorAll("[ez-uploader-browse]")[0];
+        const directory = document.querySelectorAll("[ez-uploader-browse-directory]")[0];
+        const drop = document.querySelectorAll("[ez-uploader-drop]")[0];
+
+        [file, directory, drop].forEach(node => {
+            node.addEventListener('change', e => {
+                //console.log('change event', e);
+            })
         })
 
     }
@@ -377,6 +401,7 @@ export default class EzUploader extends EzVDOM {
         if (updateDom) {
 
             //console.log('update dom from remove file');
+
             this.updateDOM();
 
         }
@@ -615,8 +640,6 @@ export default class EzUploader extends EzVDOM {
 
             }
 
-
-
         } else if (!this.uploading && file.progress() !== 1) {
 
             options.push(
@@ -652,7 +675,7 @@ export default class EzUploader extends EzVDOM {
             if (errorCount) {
 
                 buttons.push(
-                    <div ez-on-click={this.retryAllFiles.bind(this)} className="ez-uploader__modal-button ez-uploader__modal-button-blue">
+                    <div ez-on-click={this.retryAllFiles.bind(this)} className="ez-uploader__modal-button ez-uploader__modal-button-blue" style="margin-right:5px">
                         retry failed files
                     </div>
                 );
@@ -912,8 +935,8 @@ export default class EzUploader extends EzVDOM {
                         {this.getProgressVDOM()}
                     </div>
                     <div ez-uploader-drop className="ez-uploader__modal-body">
-                        <div ez-uploader-browse></div>
-                        <div ez-uploader-browse-directory></div>
+                        <input type="file" ez-uploader-browse style="display:none"></input>
+                        <input type="file" ez-uploader-browse-directory style="display:none"></input>
                         {this.getBodyVDOM()}
                     </div>
                     <div ez-show-flex={this.files.length && !this.uploading} className="ez-uploader__modal-footer">
