@@ -45,7 +45,8 @@ export default class EzUploader extends EzVDOM {
                 fileTypeErrorCallback: this.fileTypeErrorCallback.bind(this)
             }, upload),
             ui: Object.assign({}, {
-                thumbnail: false
+                thumbnail: false,
+                loadingFiles: false
             }, ui),
             throttle: Object.assign({}, {
                 rate: 1,
@@ -216,6 +217,7 @@ export default class EzUploader extends EzVDOM {
         [file, directory, drop].forEach(node => {
             node.addEventListener('change', e => {
                 //console.log('change event', e);
+                this.settings.ui.loadingFiles = true;
             })
         })
 
@@ -240,6 +242,7 @@ export default class EzUploader extends EzVDOM {
     onFilesAdded(files, event) {
 
         //console.log("multiple added", files, event);
+        this.settings.ui.loadingFiles = false;
 
         if (this.settings.ui.thumbnail) {
 
@@ -723,6 +726,16 @@ export default class EzUploader extends EzVDOM {
                         <div ez-on-click={this.browseDirectory.bind(this)} className="ez-uploader__modal-button ez-uploader__modal-button-wet-asphalt" style="margin-right:5px">Add directory</div>
                         <div ez-on-click={this.browseFiles.bind(this)} className="ez-uploader__modal-button ez-uploader__modal-button-wet-asphalt">Add files</div>
                     </div>
+                </div>
+            );
+
+        }
+
+        if (this.settings.ui.loadingFiles) {
+
+            options.push(
+                <div ez- className="ez-uploader__modal-file-loader">
+                    Loading files...
                 </div>
             );
 
