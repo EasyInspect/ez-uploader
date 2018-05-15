@@ -71,6 +71,7 @@ export default class EzUploader extends EzVDOM {
         this.addUploaderToDOM();
         this.addResumable();
         this.addKeypressEventListeners();
+        this.addFileTypeRegex(this.settings.upload.fileTypes);
 
         if (this.settings.throttle.debug) {
             window.update = this.updateDOM.bind(this);
@@ -100,6 +101,26 @@ export default class EzUploader extends EzVDOM {
         this.uploader.assignBrowse(directory, true);
         this.uploader.assignDrop(drop);
         this.addResumableEventListeners();
+
+    }
+
+    addFileTypeRegex(types) {
+
+        let regex;
+
+        if (types && types.length) {
+
+            const typeString = types.reduce((carry, type) => carry += `.${type}|`, '(').slice(0, -1).concat(')$');
+
+            regex = new RegExp(typeString, 'i');
+
+        } else {
+
+            regex = new RegExp('.')
+
+        }
+
+        this.fileTypeRegex = regex;
 
     }
 
@@ -141,12 +162,12 @@ export default class EzUploader extends EzVDOM {
 
     fileTypeErrorCallback(file, errorCount) {
 
-        const allowedTypes          = this.settings.upload.fileType;
+        const allowedTypes          = this.settings.upload.fileTypes || [];
         const allowedTypesString    = allowedTypes.reduce((result, type, index) => {
 
-            if (index == allowedTypes.length - 2) {
+            if (index === allowedTypes.length - 2) {
                 result += `${type} or `
-            } else if (index == allowedTypes.length - 1) {
+            } else if (index === allowedTypes.length - 1) {
                 result += `${type}`
             } else {
                 result += `${type}, `
@@ -217,7 +238,7 @@ export default class EzUploader extends EzVDOM {
         [file, directory, drop].forEach(node => {
             node.addEventListener('change', e => {
                 //console.log('change event', e);
-                this.settings.ui.loadingFiles = true;
+                //this.settings.ui.loadingFiles = true;
             })
         })
 
@@ -241,7 +262,34 @@ export default class EzUploader extends EzVDOM {
 
     onFilesAdded(files, event) {
 
-        //console.log("multiple added", files, event);
+        let error = false;
+
+        files.forEach((file, index) => {
+
+            // If the file isn't allowed
+            if (!this.fileTypeRegex.test(file.fileName)) {
+
+                this.uploader.removeFile(file);
+
+                // Only show one error at a time
+                if (!error) {
+
+                    this.fileTypeErrorCallback(file.file);
+
+                    error = true;
+
+                }
+
+            }
+
+        });
+
+        if (!error) {
+
+            this.clearError();
+
+        }
+
         this.settings.ui.loadingFiles = false;
 
         if (this.settings.ui.thumbnail) {
@@ -265,7 +313,6 @@ export default class EzUploader extends EzVDOM {
 
         }
 
-        this.clearError();
         //console.log('update dom onFilesAdded');
         this.updateDOM();
     }
@@ -733,11 +780,11 @@ export default class EzUploader extends EzVDOM {
 
         if (this.settings.ui.loadingFiles) {
 
-            options.push(
+            /*options.push(
                 <div ez- className="ez-uploader__modal-file-loader">
                     Loading files...
                 </div>
-            );
+            );*/
 
         }
 
