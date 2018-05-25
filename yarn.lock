@@ -1731,6 +1731,10 @@ execa@^0.7.0:
     signal-exit "^3.0.0"
     strip-eof "^1.0.0"
 
+exifreader@^2.4.2:
+  version "2.4.2"
+  resolved "https://registry.yarnpkg.com/exifreader/-/exifreader-2.4.2.tgz#8ffe822056a0c7c44f33e2417586b4c4ddd607b6"
+
 expand-brackets@^0.1.4:
   version "0.1.5"
   resolved "https://registry.yarnpkg.com/expand-brackets/-/expand-brackets-0.1.5.tgz#df07284e342a807cd733ac5af72411e581d1177b"
