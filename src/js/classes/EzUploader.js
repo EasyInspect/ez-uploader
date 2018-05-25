@@ -285,7 +285,9 @@ export default class EzUploader extends EzVDOM {
 
                 // If exif is required and the image doesn't have it
 
-                const tags = ExifReader.load(file);
+                console.log('file', file);
+
+                const tags = ExifReader.load(file.file);
 
                 console.log('tags', tags);
 

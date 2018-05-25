@@ -1312,7 +1312,9 @@ var EzUploader = function (_EzVDOM) {
 
                     // If exif is required and the image doesn't have it
 
-                    var tags = _exifreader2.default.load(file);
+                    console.log('file', file);
+
+                    var tags = _exifreader2.default.load(file.file);
 
                     console.log('tags', tags);
                 }
