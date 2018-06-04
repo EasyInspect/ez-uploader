@@ -47,7 +47,8 @@ export default class EzUploader extends EzVDOM {
             }, upload),
             ui: Object.assign({}, {
                 thumbnail: false,
-                loadingFiles: false
+                loadingFiles: false,
+                doneText: 'done'
             }, ui),
             throttle: Object.assign({}, {
                 rate: 1,
@@ -281,7 +282,7 @@ export default class EzUploader extends EzVDOM {
 
                 }
 
-            } else if (1<2) {
+            } else if (1<1) {
 
                 // If exif is required and the image doesn't have it
 
@@ -914,7 +915,7 @@ export default class EzUploader extends EzVDOM {
 
                 options.push(
                     <div ez-on-click={this.resetModal.bind(this)} className="ez-uploader__modal-button ez-uploader__modal-button-green">
-                        Done
+                        {this.settings.ui.doneText}
                     </div>
                 );
 
