@@ -1,5 +1,4 @@
 import Resumable from 'resumablejs'
-import ExifReader from 'exifreader'
 import EzVDOM from './VDOM'
 
 function h(type, props, ...children) {
@@ -281,16 +280,6 @@ export default class EzUploader extends EzVDOM {
                     error = true;
 
                 }
-
-            } else if (1<1) {
-
-                // If exif is required and the image doesn't have it
-
-                console.log('file', file);
-
-                const tags = ExifReader.load(file.file);
-
-                console.log('tags', tags);
 
             }
 
