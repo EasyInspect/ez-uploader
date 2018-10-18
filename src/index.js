@@ -8,4 +8,4 @@ import EzUploader from './js/classes/EzUploader'
 
 window.EzUploader = EzUploader;
 
-export default  EzUploader;
+export default EzUploader;
