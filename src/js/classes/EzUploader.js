@@ -556,7 +556,15 @@ export default class EzUploader extends EzVDOM {
         //console.log('cached', this.cachedVDOM);
         //console.log('modal', this.modal);
 
-        document.body.appendChild(this.modal);
+        if (this.settings.ui.container) {
+
+            this.settings.ui.container.appendChild(this.modal);
+
+        } else {
+
+            document.body.appendChild(this.modal);
+
+        }
 
     }
 
