@@ -42,7 +42,14 @@ export default class EzUploader extends EzVDOM {
                 maxFileSizeErrorCallback: this.maxFileSizeErrorCallback.bind(this),
                 minFileSizeErrorCallback: this.minFileSizeErrorCallback.bind(this),
                 fileType: [],
-                fileTypeErrorCallback: this.fileTypeErrorCallback.bind(this)
+                fileTypeErrorCallback: this.fileTypeErrorCallback.bind(this),
+                query(file) {
+
+                    return {
+                        relativePath: file.relativePath
+                    }
+
+                }
             }, upload),
             ui: Object.assign({}, {
                 thumbnail: false,
@@ -825,6 +832,11 @@ export default class EzUploader extends EzVDOM {
                             {this.convertBytesToMB(file.size)} MB
                         </span>
                     </div>
+                    { file.relativePath !== file.fileName &&
+                        <div className="ez-uploader__modal-file-error">
+                            {file.relativePath}
+                        </div>
+                    }
                     <div className="ez-uploader__modal-file-error">
                         {this.fileErrors[file.uniqueIdentifier] ? this.fileErrors[file.uniqueIdentifier].error : ''}
                     </div>
